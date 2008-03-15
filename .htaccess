@@ -1,0 +1,6 @@
+
+RewriteEngine On
+RewriteRule ^(.*)$ index.php
+
+php_flag magic_quotes_gpc off
+
