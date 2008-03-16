@@ -4,6 +4,7 @@ error_reporting(E_ALL | E_STRICT);
 assert_options(ASSERT_BAIL, TRUE);
 
 require_once('git.php');
+require_once('markup.php');
 
 $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
 $page = substr(urldecode($parts[0]), strlen('/ewiki/'));
@@ -29,8 +30,8 @@ if (count($path))
 }
 else
 {
-    header('Content-type: text/plain');
-    echo $cur->data;
+    header('Content-type: text/html');
+    echo markup_to_html($cur->data);
 }
 
 ?>
