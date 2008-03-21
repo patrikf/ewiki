@@ -110,13 +110,13 @@ else if ($action == 'edit')
 		$cur->mode = 040000;
 		$cur->name = $part;
 		$obj = new GitTree($repo);
-		array_unshift($pending_refs, array($cur, $obj));
 	    }
 	    else
 	    {
 		$cur = $obj->nodes[$part];
 		$obj = clone $repo->getObject($cur->object);
 	    }
+	    array_unshift($pending_refs, array($cur, $obj));
 	}
 	array_shift($pending_refs); /* we're overwriting this saved tree */
 	$cur->mode = 0100640;
