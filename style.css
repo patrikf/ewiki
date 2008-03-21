@@ -36,7 +36,7 @@ body
 }
 
 #pagelinks a { color: #555; margin: 0px .5em; }
-#pagelinks a.active { color: #AAA; text-decoration: underline; }
+#pagelinks a.active { color: #AAA; text-decoration: none; }
 
 p
 {
@@ -65,4 +65,20 @@ h1 { font-size: 2.4em; }
 h2 { font-size: 1.4em; }
 h3 { font-size: 1.2em; }
 h4 { font-size: .8em; font-weight: bold; }
+
+table
+{
+    line-height: 1.2;
+    margin: .75em 0px;
+}
+
+table td, table th
+{
+    padding: .2em .4em;
+}
+
+table th { font-weight: bold; }
+
+em { font-style: italic; }
+strong { font-weight: bold; }
 

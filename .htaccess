@@ -1,5 +1,6 @@
 
 RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php
 
 php_flag magic_quotes_gpc off

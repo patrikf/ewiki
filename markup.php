@@ -9,7 +9,7 @@ function parse_link_target($ref)
     else if ($parts[0] == 'http')
 	$url = $ref;
     else
-	$url = 'http://fimml.at.local/ewiki/'.implode('/', array_map('urlencode', explode('/', (strtr($ref, ' ', '_')))));
+	$url = '/'.implode('/', array_map('urlencode', explode('/', (strtr($ref, ' ', '_')))));
     return array($url, $ref);
 }
 

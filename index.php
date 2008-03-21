@@ -5,33 +5,27 @@ assert_options(ASSERT_BAIL, TRUE);
 
 require_once('git.php');
 require_once('markup.php');
+require_once('wikipage.php');
+require_once('view.php');
+
+$repository = new Git('/home/patrik/git/ewiki/.git');
 
 $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
-$page = substr(urldecode($parts[0]), strlen('/ewiki/'));
-$query = isset($parts[1]) ? $parts[1] : '';
+$page = WikiPage::from_url($parts[0]);
 
-$repo = new Git('/home/patrik/git/ewiki/.git');
-$head = $repo->getObject($repo->getHead('master'));
+$action = isset($_GET['action']) ? $_GET['action'] : '';
+if ($action == '')
+    $action = 'view';
 
-$path = explode('/', $page);
-$cur = $repo->getObject($head->tree);
-while (count($path) && $path[0] != '')
-{
-    if ($cur->getType() != Git::OBJ_TREE)
-	die('Not a tree');
-    if (!isset($cur->nodes[$path[0]]))
-	die('Not found');
-    $cur = $repo->getObject($cur->nodes[array_shift($path)]->object);
-}
-
-if (count($path))
-{
-    /* directory view */
-}
-else
+if ($action == 'view')
 {
     header('Content-type: text/html');
-    echo markup_to_html($cur->data);
+    $view = new View('views/page-view.php');
+    $view->page = $page;
+    $view->display();
+}
+else if ($action == 'history')
+{
 }
 
 ?>
