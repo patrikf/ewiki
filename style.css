@@ -50,6 +50,11 @@ a
     text-decoration: none;
 }
 
+a.new
+{
+    color: #A00;
+}
+
 a:hover
 {
     text-decoration: underline;
@@ -81,4 +86,9 @@ table th { font-weight: bold; }
 
 em { font-style: italic; }
 strong { font-weight: bold; }
+
+table.history
+{
+    font-size: .8em;
+}
 

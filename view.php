@@ -11,7 +11,7 @@ class View
     }
 
     function __set($name, $value) { $this->_dict[$name] = $value; }
-    function __get($name) { return $this->_dict[$name]; }
+    function &__get($name) { return $this->_dict[$name]; }
     function __isset($name) { isset($this->_dict[$name]); }
     function __unset($name) { unset($this->_dict[$name]); }
 

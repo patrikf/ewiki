@@ -10,12 +10,22 @@
 </div>
 <div id="page">
 <div id="pagelinks">
-    <a href="<?php echo $page->get_url(); ?>" class="active">view</a>
+    <a href="<?php echo $page->get_url(); ?>">view</a>
     <a href="<?php echo $page->get_url(); ?>?action=edit">edit</a>
-    <a href="<?php echo $page->get_url(); ?>?action=history">history</a>
+    <a href="<?php echo $page->get_url(); ?>?action=history" class="active">history</a>
 </div>
 <h1 id="pagetitle"><?php echo markup_escape($page->get_name()); ?></h1>
-<?php echo $page->format(); ?>
+<table class="history">
+<?php
+    foreach ($history as $entry)
+	printf('<tr><td><a href="%s?commit=%s">%s</a></td><td>%s</td><td>%s</td></tr>',
+	    $page->get_url(),
+	    $entry->commit,
+	    markup_escape(strftime('%Y-%m-%d %H:%M', $entry->time)),
+	    markup_escape($entry->author),
+	    markup_escape($entry->summary));
+?>
+</table>
 </div>
 </body>
 </html>

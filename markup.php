@@ -4,13 +4,20 @@ function parse_link_target($ref)
 {
     $ref = strtr($ref, "\n", ' ');
     $parts = explode(':', $ref, 2);
+    $valid = -1;
     if ($parts[0] == 'wp')
-	$url = 'http://en.wikipedia.org/wiki/'.implode('/', array_map('urlencode', explode('/', (strtr($parts[1], ' ', '_')))));
+    {
+	$url = 'http://en.wikipedia.org/wiki/'.strtr(implode('/', array_map('urlencode', explode('/', $parts[1]))), '+', '_');
+    }
     else if ($parts[0] == 'http')
 	$url = $ref;
     else
-	$url = '/'.implode('/', array_map('urlencode', explode('/', (strtr($ref, ' ', '_')))));
-    return array($url, $ref);
+    {
+	$page = new WikiPage(explode('/', $ref));
+	$valid = ($page->object !== NULL);
+	$url = $page->get_url();
+    }
+    return array($url, $ref, $valid);
 }
 
 function markup_escape($in, $raw=FALSE)
@@ -69,8 +76,8 @@ function markup_parse(&$in, &$out, $context)
 	    $in = substr($in, 2);
 	    $target = '';
 	    markup_parse($in, $target, 'link_target');
-	    list($url, $caption) = parse_link_target($target);
-	    $out .= sprintf('<a href="%s">', htmlspecialchars($url, 0, 'UTF-8'));
+	    list($url, $caption, $valid) = parse_link_target($target);
+	    $out .= sprintf('<a href="%s" class="%s">', htmlspecialchars($url, 0, 'UTF-8'), $valid ? '' : 'new');
 	    if (substr($in, 0, 1) == '|')
 	    {
 		$in = substr($in, 1);
