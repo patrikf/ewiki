@@ -11,7 +11,7 @@ require_once('wikipage.php');
 require_once('view.php');
 require_once('pfcore-tiny.php');
 
-$repo = new Git('/home/patrik/git/ewiki/.git');
+$repo = new Git('/srv/patrik/ewiki.git');
 
 $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
 
