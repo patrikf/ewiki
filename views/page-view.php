@@ -1,4 +1,4 @@
-<?php echo '<?xml version="1.0"?>'; ?>
+<?php echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
 <!DOCTYPE html PUBLIC "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
