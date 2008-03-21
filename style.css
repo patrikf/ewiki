@@ -92,3 +92,23 @@ table.history
     font-size: .8em;
 }
 
+#edit-form textarea
+{
+    font-family: monospace;
+    font-size: .9em;
+    width: 100%;
+    border: 1px solid #000;
+    padding: .25em;
+    height: 30em;
+    overflow: scroll;
+}
+
+#edit-form input.summary
+{
+    font-family: monospace;
+    font-size: .9em;
+    width: 100%;
+    border: 1px solid #000;
+    padding: .25em;
+}
+
