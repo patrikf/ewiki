@@ -14,11 +14,18 @@ require_once('pfcore-tiny.php');
 $repo = new Git('/home/patrik/git/ewiki/.git');
 
 $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
-$page = WikiPage::from_url($parts[0]);
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 if ($action == '')
     $action = 'view';
+
+if (isset($_GET['commit']))
+    $commit = sha1_bin($_GET['commit']);
+else
+    $commit = $repo->getHead('master');
+$commit = $repo->getObject($commit);
+
+$page = WikiPage::from_url($parts[0], $commit);
 
 if ($action == 'view')
 {
@@ -43,7 +50,7 @@ else if ($action == 'history')
 	$entry->commit = $commit->getName();
 	try
 	{
-	    $entry->blob = WikiPage::find_page($commit, $page->path);
+	    $entry->blob = WikiPage::find_page($commit, $page->path)->getName();
 	}
 	catch (InvalidPageError $e)
 	{

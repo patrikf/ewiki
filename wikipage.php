@@ -6,16 +6,17 @@ class PageNotFoundError extends InvalidPageError {}
 
 class WikiPage
 {
-    function __construct($path)
+    function __construct($path, $commit=NULL)
     {
 	global $repo;
 
 	$this->path = $path;
 
-	$head = $repo->getObject($repo->getHead('master'));
+	if ($commit === NULL)
+	    $commit = $repo->getObject($repo->getHead('master'));
 	try
 	{
-	    $this->object = $repo->getObject(WikiPage::find_page($head, $path));
+	    $this->object = WikiPage::find_page($commit, $path);
 	}
 	catch (InvalidPageError $e)
 	{
@@ -38,7 +39,7 @@ class WikiPage
 	return markup_to_html($this->object->data);
     }
 
-    static function from_url($name)
+    static function from_url($name, $commit=NULL)
     {
 	$path = array();
 	$dir = FALSE;
@@ -54,21 +55,20 @@ class WikiPage
 	    $path = array('Home');
 	else if ($dir)
 	    array_push($path, '');
-	return new WikiPage($path);
+	return new WikiPage($path, $commit);
     }
     static function find_page($commit, $path)
     {
-	$cur = $commit->tree;
+	$cur = $commit->repo->getObject($commit->tree);
 	while (count($path))
 	{
-	    $cur = $commit->repo->getObject($cur);
 	    if ($cur->getType() != Git::OBJ_TREE)
 		throw new InvalidTreeError;
 	    if ($path[0] == '')
 		break;
 	    if (!isset($cur->nodes[$path[0]]))
 		throw new PageNotFoundError;
-	    $cur = $cur->nodes[array_shift($path)]->object;
+	    $cur = $commit->repo->getObject($cur->nodes[array_shift($path)]->object);
 	}
 	return $cur;
     }
