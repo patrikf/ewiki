@@ -9,6 +9,7 @@ require_once('git.php');
 require_once('markup.php');
 require_once('wikipage.php');
 require_once('view.php');
+require_once('pfcore-tiny.php');
 
 $repo = new Git('/home/patrik/git/ewiki/.git');
 
