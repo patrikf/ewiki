@@ -27,7 +27,7 @@ class WikiPage
     {
 	$url = '';
 	foreach ($this->path as $part)
-	    $url .= '/'.strtr(urlencode($part), '+', '_');
+	    $url .= '/'.strtr(str_replace('_', '%5F', urlencode($part)), '+', '_');
 	return $url;
     }
     function get_name()
