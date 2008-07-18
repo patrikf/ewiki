@@ -6,7 +6,7 @@ setlocale(LC_ALL, 'en_GB.UTF-8');
 date_default_timezone_set('Europe/Vienna');
 set_include_path(get_include_path() . PATH_SEPARATOR . './include/');
 
-require_once('git.php');
+require_once('git/git.class.php');
 require_once('markup.php');
 require_once('wikipage.php');
 require_once('view.php');
