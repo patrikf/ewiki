@@ -4,6 +4,7 @@ error_reporting(E_ALL | E_STRICT);
 assert_options(ASSERT_BAIL, TRUE);
 setlocale(LC_ALL, 'en_GB.UTF-8');
 date_default_timezone_set('Europe/Vienna');
+set_include_path(get_include_path() . PATH_SEPARATOR . './include/');
 
 require_once('git.php');
 require_once('markup.php');
