@@ -36,7 +36,7 @@ class WikiPage
     }
     function format()
     {
-	return markup_to_html($this->object->data);
+	return Markup::markup2html($this->object->data);
     }
 
     static function from_url($name, $commit=NULL)
