@@ -2,9 +2,12 @@
 
 error_reporting(E_ALL | E_STRICT);
 assert_options(ASSERT_BAIL, TRUE);
-setlocale(LC_ALL, 'en_GB.UTF-8');
-date_default_timezone_set('Europe/Vienna');
-set_include_path(get_include_path() . PATH_SEPARATOR . './include/');
+
+set_include_path('include/');
+require_once('config.class.php');
+
+setlocale(LC_ALL, Config::LOCALE);
+date_default_timezone_set(Config::TIMEZONE);
 
 require_once('git/git.class.php');
 require_once('markup.class.php');
@@ -12,7 +15,7 @@ require_once('wikipage.php');
 require_once('view.php');
 require_once('pfcore-tiny.php');
 
-$repo = new Git('/srv/patrik/ewiki.git');
+$repo = new Git(Config::GIT_PATH);
 
 $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
 
@@ -23,7 +26,7 @@ if ($action == '')
 if (isset($_GET['commit']))
     $commit = sha1_bin($_GET['commit']);
 else
-    $commit = $repo->getHead('master');
+    $commit = $repo->getHead(Config::GIT_BRANCH);
 $commit = $repo->getObject($commit);
 
 $page = WikiPage::from_url($parts[0], $commit);
@@ -40,7 +43,7 @@ else if ($action == 'history')
     $view->page = $page;
 
     $history = array();
-    $commits = array($repo->getHead('master'));
+    $commits = array($repo->getHead(Config::GIT_BRANCH));
     while (($commit = array_shift($commits)) !== NULL)
     {
 	$commit = $repo->getObject($commit);
@@ -134,8 +137,8 @@ else if ($action == 'edit')
 	$newcommit->tree = $tree->getName();
 	$newcommit->parents = array($commit->getName());
 	$stamp = new GitCommitStamp;
-	$stamp->name = 'Patrik Fimml';
-	$stamp->email = 'patrik@fimml.at';
+	$stamp->name = Config::AUTHOR_NAME;
+	$stamp->email = Config::AUTHOR_MAIL;
 	$stamp->time = time();
 	$stamp->offset = idate('Z', $stamp->time);
 
@@ -146,8 +149,8 @@ else if ($action == 'edit')
 	$newcommit->detail = '';
 	$newcommit->rehash();
 
-	/* now, try to atomically fast-forward master branch */
-	$f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, 'master'), 'a+');
+	/* now, try to automically fast-forward configured branch branch */
+	$f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_BRANCH), 'a+');
 	flock($f, LOCK_EX);
 	$ref = stream_get_contents($f);
 	if (strlen($ref) == 0 || sha1_bin($ref) == $commit->getName())

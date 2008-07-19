@@ -13,7 +13,7 @@ class WikiPage
 	$this->path = $path;
 
 	if ($commit === NULL)
-	    $commit = $repo->getObject($repo->getHead('master'));
+	    $commit = $repo->getObject($repo->getHead(Config::GIT_BRANCH));
 	try
 	{
 	    $this->object = WikiPage::find_page($commit, $path);

@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
-<title>eWiki: <?php echo Markup::escape($page->get_name()); ?></title>
+<title><?php echo Config::WIKI_NAME; ?>: <?php echo Markup::escape($page->get_name()); ?></title>
 <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
