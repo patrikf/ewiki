@@ -25,9 +25,9 @@ class WikiPage
     }
     function get_url()
     {
-	$url = '';
+	$url = Config::PATH;
 	foreach ($this->path as $part)
-	    $url .= '/'.strtr(str_replace('_', '%5F', urlencode($part)), '+', '_');
+	    $url .= '/' . strtr(str_replace('_', '%5F', urlencode($part)), '+', '_');
 	return $url;
     }
     function get_name()

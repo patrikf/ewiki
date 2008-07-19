@@ -3,7 +3,7 @@
 <html>
 <head>
 <title><?php echo Config::WIKI_NAME; ?>: <?php echo Markup::escape($page->get_name()); ?></title>
-<link rel="stylesheet" href="/style.css" />
+<link rel="stylesheet" href="<?php echo Config::PATH; ?>/style.css" />
 </head>
 <body>
 <div id="head">

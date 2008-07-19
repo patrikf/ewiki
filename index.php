@@ -18,6 +18,8 @@ require_once('pfcore-tiny.php');
 $repo = new Git(Config::GIT_PATH);
 
 $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
+assert(!strncmp($parts[0], Config::PATH, strlen(Config::PATH)));
+$parts[0] = substr($parts[0], strlen(Config::PATH));
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 if ($action == '')

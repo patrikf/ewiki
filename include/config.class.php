@@ -6,6 +6,9 @@ final class Config
     // The name of the wiki
     const WIKI_NAME = 'eWiki';
 
+    // The absolute path of the wiki (no trailing slash)
+    const PATH = '';
+
     // The path to the git repository
     const GIT_PATH = '/srv/git/wiki.git';
 
