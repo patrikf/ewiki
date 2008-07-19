@@ -12,7 +12,7 @@ date_default_timezone_set(Config::TIMEZONE);
 require_once('git/git.class.php');
 require_once('markup.class.php');
 require_once('wikipage.php');
-require_once('view.php');
+require_once('view.class.php');
 require_once('pfcore-tiny.php');
 
 $repo = new Git(Config::GIT_PATH);
@@ -35,13 +35,13 @@ $page = WikiPage::from_url($parts[0], $commit);
 
 if ($action == 'view')
 {
-    $view = new View('views/page-view.php');
+    $view = new View('page-view.php');
     $view->page = $page;
     $view->display();
 }
 else if ($action == 'history')
 {
-    $view = new View('views/page-history.php');
+    $view = new View('page-history.php');
     $view->page = $page;
 
     $history = array();
@@ -86,7 +86,7 @@ else if ($action == 'history')
 }
 else if ($action == 'edit')
 {
-    $view = new View('views/page-edit.php');
+    $view = new View('page-edit.php');
 
     if (isset($_POST['content']))
     {

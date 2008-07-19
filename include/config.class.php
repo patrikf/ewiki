@@ -9,6 +9,9 @@ final class Config
     // The absolute path of the wiki (no trailing slash)
     const PATH = '';
 
+    // The template for the wiki (see templates/)
+    const TEMPLATE = 'archaic';
+
     // The path to the git repository
     const GIT_PATH = '/srv/git/wiki.git';
 
