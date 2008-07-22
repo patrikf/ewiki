@@ -17,12 +17,6 @@ final class Config
     // The branch that should be used
     const GIT_BRANCH = 'master';
 
-    // Name of the author used for edits via the web interface
-    const AUTHOR_NAME = 'Anonymous Coward';
-
-    // Mail of the author used for edits via the web interface
-    const AUTHOR_MAIL = 'anonymous@wiki.invalid';
-
     // The locale used by the wiki
     const LOCALE = 'en_US.UTF-8';
 

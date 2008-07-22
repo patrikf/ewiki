@@ -139,8 +139,8 @@ else if ($action == 'edit')
 	$newcommit->tree = $tree->getName();
 	$newcommit->parents = array($commit->getName());
 	$stamp = new GitCommitStamp;
-	$stamp->name = Config::AUTHOR_NAME;
-	$stamp->email = Config::AUTHOR_MAIL;
+	$stamp->name = $_SERVER['REMOTE_ADDR'];
+	$stamp->email = sprintf('anonymous@%s', $_SERVER['REMOTE_ADDR']);
 	$stamp->time = time();
 	$stamp->offset = idate('Z', $stamp->time);
 
