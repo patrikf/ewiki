@@ -6,13 +6,9 @@
 <link rel="stylesheet" href="<?= Config::PATH . '/templates/' . Config::TEMPLATE . '/style.css' ?>" />
 </head>
 <body>
-<div id="head">
-</div>
 <div id="page">
-<?php if (isset($page)): ?>
 <div id="pagelinks">
 <?php foreach (array('view', 'edit', 'history') as $i): ?>
     <a href="<?= $page->get_url() ?><?= $i == 'view' ? '' : '?action='.$i ?>"<?= $i == $action ? ' class="active"' : '' ?>><?= $i ?></a>
 <?php endforeach; ?>
 </div>
-<?php endif; ?>
