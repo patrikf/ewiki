@@ -15,6 +15,12 @@ require_once('wikipage.php');
 require_once('view.class.php');
 require_once('pfcore-tiny.php');
 
+function redirect($uri)
+{
+    header('HTTP/1.1 303 See Other');
+    header('Location: '.$uri);
+}
+
 $repo = new Git(Config::GIT_PATH);
 
 $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
@@ -167,6 +173,7 @@ else if ($action == 'edit')
 	    throw new Exception('fast-forward merge not possible');
 	}
 	fclose($f);
+        redirect($page->get_url());
     }
 
     $view = new View('page-edit.php');
