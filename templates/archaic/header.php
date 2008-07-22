@@ -3,7 +3,7 @@
 <html>
 <head>
 <title><?= Config::WIKI_NAME ?>: <?= Markup::escape($page->get_name()) ?></title>
-<link rel="stylesheet" href="<?= Config::PATH . 'templates/' . Config::TEMPLATE . '/style.css' ?>" />
+<link rel="stylesheet" href="<?= Config::PATH . '/templates/' . Config::TEMPLATE . '/style.css' ?>" />
 </head>
 <body>
 <div id="head">
