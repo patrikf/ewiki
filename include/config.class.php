@@ -2,7 +2,6 @@
 
 final class Config
 {
-
     // The name of the wiki
     const WIKI_NAME = 'eWiki';
 
@@ -29,6 +28,5 @@ final class Config
 
     // The time zone of the wiki
     const TIMEZONE = 'GMT';
-
 }
 
