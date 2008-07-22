@@ -79,7 +79,10 @@ class Markup
                 $target = '';
                 Markup::parse($in, $target, 'link_target');
                 list($url, $caption, $valid) = Markup::parse_link_target($target);
-                $out .= sprintf('<a href="%s" class="%s">', htmlspecialchars($url, 0, 'UTF-8'), $valid ? '' : 'new');
+                $out .= '<a href="' . htmlspecialchars($url, 0, 'UTF-8') . '"';
+                if ($valid)
+                    $out .= ' class="new"';
+                $out .= '>';
                 if (substr($in, 0, 1) == '|')
                 {
                     $in = substr($in, 1);
