@@ -7,8 +7,14 @@
 </head>
 <body>
 <div id="page">
-<div id="pagelinks">
-<?php foreach (array('view', 'edit', 'history') as $i): ?>
-    <a href="<?= $page->get_url() ?><?= $i == 'view' ? '' : '?action='.$i ?>"<?= $i == $action ? ' class="active"' : '' ?>><?= $i ?></a>
-<?php endforeach; ?>
+<div id="linkpane">
+    <div id="globallinks">
+        <a href="<?= Config::PATH ?>/">home</a>
+    </div>
+    <div id="pagelinks">
+    <?php foreach (array('view', 'edit', 'history') as $i): ?>
+        <a href="<?= $page->get_url() ?><?= $i == 'view' ? '' : '?action='.$i ?>"<?= $i == $action ? ' class="active"' : '' ?>><?= $i ?></a>
+    <?php endforeach; ?>
+    </div>
+    <div style="clear: both"></div>
 </div>
