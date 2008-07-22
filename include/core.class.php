@@ -145,7 +145,7 @@ class Core
     }
 }
 
-set_exception_handler('Core::handle_exception');
-set_error_handler('Core::handle_error');
+set_exception_handler(array('Core', 'handle_exception'));
+set_error_handler(array('Core', 'handle_error'));
 
 ?>
