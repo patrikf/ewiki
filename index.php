@@ -4,6 +4,7 @@ error_reporting(E_ALL | E_STRICT);
 assert_options(ASSERT_BAIL, TRUE);
 
 set_include_path('include/');
+require_once('core.class.php');
 require_once('config.class.php');
 
 setlocale(LC_ALL, Config::LOCALE);
@@ -11,9 +12,8 @@ date_default_timezone_set(Config::TIMEZONE);
 
 require_once('git/git.class.php');
 require_once('markup.class.php');
-require_once('wikipage.php');
+require_once('wikipage.class.php');
 require_once('view.class.php');
-require_once('pfcore-tiny.php');
 
 function redirect($uri)
 {
