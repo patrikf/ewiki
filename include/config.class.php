@@ -12,7 +12,7 @@ final class Config
     const TEMPLATE = 'archaic';
 
     // The path to the git repository
-    const GIT_PATH = '/srv/git/wiki.git';
+    const GIT_PATH = '/srv/patrik/ewiki.git';
 
     // The branch that should be used
     const GIT_BRANCH = 'master';
@@ -30,7 +30,7 @@ final class Config
     const LOCALE = 'en_US.UTF-8';
 
     // The time zone of the wiki
-    const TIMEZONE = 'GMT';
+    const TIMEZONE = 'Europe/Vienna';
 
     // The default maximum image width
     const IMAGE_WIDTH = 640;
@@ -51,9 +51,9 @@ final class Config
     const DSN = 'pgsql:';
 
     // Treat empty files as non-existent
-    const IGNORE_EMPTY_PAGES = false;
+    const IGNORE_EMPTY_PAGES = true;
 
     // How to sort pages in tree view (comparison callback)
-    const TREE_VIEW_SORT = 'strnatcmp';
+    const TREE_VIEW_SORT = 'strnatcasecmp';
 }
 
