@@ -151,7 +151,7 @@ else if ($action == 'edit')
 	$newcommit->detail = '';
 	$newcommit->rehash();
 
-	/* now, try to automically fast-forward configured branch branch */
+	/* now, try to automatically fast-forward configured branch */
 	$f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_BRANCH), 'a+');
 	flock($f, LOCK_EX);
 	$ref = stream_get_contents($f);
