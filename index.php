@@ -37,12 +37,14 @@ if ($action == 'view')
 {
     $view = new View('page-view.php');
     $view->page = $page;
+    $view->action = $action;
     $view->display();
 }
 else if ($action == 'history')
 {
     $view = new View('page-history.php');
     $view->page = $page;
+    $view->action = $action;
 
     $history = array();
     $commits = array($repo->getHead(Config::GIT_BRANCH));
@@ -86,8 +88,6 @@ else if ($action == 'history')
 }
 else if ($action == 'edit')
 {
-    $view = new View('page-edit.php');
-
     if (isset($_POST['content']))
     {
 	$content = str_replace("\r", '', str_replace("\r\n", "\n", $_POST['content']));
@@ -169,9 +169,11 @@ else if ($action == 'edit')
 	fclose($f);
     }
 
+    $view = new View('page-edit.php');
     $view->commit = sha1_hex($commit->getName());
     $view->new = ($page->object === NULL);
     $view->page = $page;
+    $view->action = $action;
     if (isset($content))
     {
 	$view->content = $content;

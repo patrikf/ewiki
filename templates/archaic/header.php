@@ -9,10 +9,10 @@
 <div id="head">
 </div>
 <div id="page">
-<?php if(isset($page)): ?>
+<?php if (isset($page)): ?>
 <div id="pagelinks">
-    <a href="<?= $page->get_url() ?>">view</a>
-    <a href="<?= $page->get_url() ?>?action=edit" class="active">edit</a>
-    <a href="<?= $page->get_url() ?>?action=history">history</a>
+<?php foreach (array('view', 'edit', 'history') as $i): ?>
+    <a href="<?= $page->get_url() ?><?= $i == 'view' ? '' : '?action='.$i ?>"<?= $i == $action ? ' class="active"' : '' ?>><?= $i ?></a>
+<?php endforeach; ?>
 </div>
 <?php endif; ?>
