@@ -39,7 +39,7 @@ $commit = $repo->getObject($commit);
 
 $page = WikiPage::from_url($parts[0], $commit);
 
-if ($action == 'view')
+if ($action == 'view') // {{{1
 {
     if ($page->is_binary())
         $view = new View('page-view-binary.php');
@@ -49,7 +49,7 @@ if ($action == 'view')
     $view->action = $action;
     $view->display();
 }
-else if ($action == 'history')
+else if ($action == 'history') // {{{1
 {
     $view = new View('page-history.php');
     $view->page = $page;
@@ -95,7 +95,7 @@ else if ($action == 'history')
 
     $view->display();
 }
-else if ($action == 'edit')
+else if ($action == 'edit') // {{{1
 {
     if (isset($_POST['content']))
     {
@@ -193,5 +193,16 @@ else if ($action == 'edit')
 
     $view->display();
 }
+else if ($action == 'get') // {{{1
+{
+    if ($page->is_binary())
+        header('Content-Type: application/octet-stream');
+    else
+        header('Content-Type: text/plain');
+    header('Content-Disposition: inline; filename="' . addcslashes($page->get_name(), '"') . '"');
+    echo $page->object->data;
+} // }}}1
+
+/* vim:set fdm=marker fmr={{{,}}}: */
 
 ?>
