@@ -75,6 +75,17 @@ class MIME
 
     protected function glob($filename)
     {
+        $pos = $this->uint32_at(20);
+        $n = $this->uint32_at($pos);
+
+        $pos += 4;
+        for ($i = 0; $i < $n; $i++, $pos += 8)
+        {
+            list($glob_off, $type_off) = $this->nuint32_at($pos, 2);
+            $glob = $this->string_at($glob_off);
+            if (fnmatch($glob, $filename))
+                return $this->string_at($type_off);
+        }
         return NULL;
     }
 
