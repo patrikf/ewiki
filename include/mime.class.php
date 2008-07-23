@@ -227,6 +227,15 @@ class MIME
             if (count($r))
                 return $r[0][1];
         }
+
+        /* have a guess */
+        for ($i = 0; $i < 32 && $i < strlen($buf); $i++)
+        {
+            $c = ord($buf{$i});
+            if ($c < 0x20 && $c != 10 /* \n */)
+                return 'application/octet-stream';
+        }
+        return 'text/plain';
     }
 };
 
