@@ -48,24 +48,30 @@ $view->commit_id = $commit_id;
 
 if ($action == 'view') // {{{1
 {
-    if ($page->is_tree())
+    switch ($page->get_page_type())
     {
-        $view->set_template('page-view-tree.php');
+        case WikiPage::TYPE_PAGE:
+            $view->set_template('page-view.php');
+            break;
+        case WikiPage::TYPE_IMAGE:
+            $view->set_template('page-view-image.php');
+            break;
+        case WikiPage::TYPE_BINARY:
+            $view->set_template('page-view-binary.php');
+            break;
+        case WikiPage::TYPE_TREE:
+            $view->set_template('page-view-tree.php');
 
-        $view->entries = array();
-        foreach ($page->list_entries() as $entry)
-        {
-            $obj = new stdClass;
-            $obj->url = $entry->get_url() . ($is_head ? '' : '?commit='.$commit_id);
-            $obj->name = $entry->get_name();
-            array_push($view->entries, $obj);
-        }
+            $view->entries = array();
+            foreach ($page->list_entries() as $entry)
+            {
+                $obj = new stdClass;
+                $obj->url = $entry->get_url() . ($is_head ? '' : '?commit='.$commit_id);
+                $obj->name = $entry->get_name();
+                array_push($view->entries, $obj);
+            }
+            break;
     }
-    else if (!$page->is_wiki_page())
-        $view->set_template('page-view-binary.php');
-    else
-        $view->set_template('page-view.php');
-
     $view->display();
 }
 else if ($action == 'history') // {{{1
@@ -211,6 +217,59 @@ else if ($action == 'get') // {{{1
     header('Content-Disposition: inline; filename="' . addcslashes($page->get_name(), '"') . '"');
     header('Content-Length: '.strlen($page->object->data));
     echo $page->object->data;
+}
+else if ($action == 'image') // {{{ 1
+{
+    assert($page->get_page_type() == WikiPage::TYPE_IMAGE);
+    header('Content-Type: '.$page->get_mime_type());
+    header('Content-Disposition: inline; filename="' . addcslashes($page->get_name(), '"') . '"');
+
+    if (isset($_GET['width']) || isset($_GET['height']))
+    {
+        // Resize (oh god why does php not have a simple image_resize function?)
+        $new_size = array((int)$_GET['width'], (int)$_GET['width']);
+        if ($new_size[0] < 10)
+            $new_size[0] = Config::IMAGE_WIDTH;
+        if ($new_size[1] < 10)
+            $new_size[1] = Config::IMAGE_HEIGHT;
+        $old_image = imagecreatefromstring($page->object->data);
+        $old_size = array(imagesx($old_image), imagesy($old_image));
+        $factor = min($new_size[0] / $old_size[0], $new_size[1] / $old_size[1]); // Keep aspect ratio
+        if ($factor < 1)
+        {
+            $new_size = array((int)$old_size[0] * $factor, (int)$old_size[1] * $factor);
+            $new_image = imagecreatetruecolor($new_size[0], $new_size[1]);
+            imagecopyresampled($new_image, $old_image, 0, 0, 0, 0, $new_size[0], $new_size[1], $old_size[0], $old_size[1]);
+            imagedestroy($old_image);
+        }
+        else
+            $new_image = $old_image; // No resize if image already has the right size or is smaller than wanted size
+        unset($factor, $old_size, $new_size, $old_image);
+
+        // Send the image
+        switch ($page->get_mime_type())
+        {
+            case 'image/gif':
+                imagegif($new_image);
+                break;
+            case 'image/jpeg':
+                imagejpeg($new_image, null, 100);
+                break;
+            case 'image/png':
+                imagepng($new_image, null, 9);
+                break;
+            case 'image/vnd.wap.wbmp':
+                imagewbmp($new_image);
+                break;
+            case 'image/x-xbitmap':
+                imagexbm($new_image);
+                break;
+        }
+        imagedestroy($new_image);
+    }
+    else
+            echo $page->object->data;
+
 } // }}}1
 
 /* vim:set fdm=marker fmr={{{,}}}: */

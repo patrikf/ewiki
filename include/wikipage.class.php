@@ -9,6 +9,11 @@ class WikiPage
     public $path;
     public $object;
 
+    const TYPE_PAGE = 0;
+    const TYPE_IMAGE = 1;
+    const TYPE_BINARY = 2;
+    const TYPE_TREE = 3;
+
     public function __construct($path, $commit=NULL)
     {
         global $repo;
@@ -34,24 +39,19 @@ class WikiPage
         $url = Config::PATH;
         foreach ($this->path as $part)
             $url .= '/' . strtr(str_replace('_', '%5F', urlencode($part)), '+', '_');
-        if ($this->is_tree())
+        if ($this->object instanceof GitTree)
             $url .= '/';
         return $url;
     }
 
     public function get_name()
     {
-        return implode('/', $this->path).($this->is_tree() ? '/' : '');
+        return implode('/', $this->path).($this->object instanceof GitTree ? '/' : '');
     }
 
     public function format()
     {
         return Markup::markup2html($this->object->data);
-    }
-
-    public function is_tree()
-    {
-        return ($this->object instanceof GitTree);
     }
 
     public function list_entries()
@@ -64,9 +64,17 @@ class WikiPage
         return $entries;
     }
 
-    public function is_wiki_page()
+    public function get_page_type()
     {
-        return (!$this->is_tree() && $this->get_mime_type() == 'text/plain');
+        if ($this->object instanceof GitTree)
+            return self::TYPE_TREE;
+        $mime_type = $this->get_mime_type();
+        if ($mime_type == 'text/plain')
+            return self::TYPE_PAGE;
+        else if (!strncmp($mime_type, 'image/', 6))
+            return self::TYPE_IMAGE;
+        else
+            return self::TYPE_BINARY;
     }
 
     public function get_mime_type()
