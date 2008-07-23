@@ -54,15 +54,52 @@ class MIME
         return NULL;
     }
 
+    protected static function byteswap(&$a, $word)
+    {
+        /*
+         * FIXME: add check for big-endian machines, which do not need
+         * swapping
+         */
+        for ($i = 0; $i < count($a); $i += $word)
+            array_splice($a, $i, $word, array_reverse(array_slice($a, $i, $word)));
+    }
+
     protected function buf_matchlet(&$buf, $pos)
     {
-        list($range_off, $range_len, $word_len, $value_len, $value_off, $mask_off, $n_child, $child_off)
+        list($off, $range, $word_size, $len, $value_off, $mask_off, $n_child, $child_off)
             = $this->nuint32_at($pos, 8);
 
-        printf("matchlet: value_len(%d) range_len(%d)\n", $value_len, $range_len);
-        return FALSE;
+        $range = min($range, strlen($buf)-$len-$off+1);
+        if ($range <= 0)
+            return FALSE;
 
-        return $this->buf_matchlets($buf, $child_off, $n_child);
+        $value = array_map('ord', str_split($this->substr($value_off, $len)));
+        if ($mask_off)
+            $mask = array_map('ord', str_split($this->substr($mask_off, $len)));
+        else
+            $mask = NULL;
+
+        assert(($len % $word_size) == 0);
+        if ($word_size > 1)
+        {
+            self::byteswap($value, $word_size);
+            if ($mask)
+                self::byteswap($mask, $word_size);
+        }
+
+        for ($start = $off; $start < $off+$range; $start++)
+        {
+            for ($i = 0; $i < $len; $i++)
+            {
+                $c = ord($buf{$start+$i});
+                if ($mask)
+                    $c &= $mask[$i];
+                if ($c != $value[$i])
+                    continue 2;
+            }
+            return $this->buf_matchlets($buf, $child_off, $n_child);
+        }
+        return FALSE;
     }
 
     protected function buf_matchlets(&$buf, $pos, $n)
