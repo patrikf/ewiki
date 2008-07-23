@@ -9,6 +9,10 @@ class WikiPage
     public $path;
     public $object;
 
+    const TYPE_PAGE = 0;
+    const TYPE_IMAGE = 1;
+    const TYPE_BINARY = 2;
+
     public function __construct($path, $commit=NULL)
     {
         global $repo;
@@ -43,9 +47,15 @@ class WikiPage
         return Markup::markup2html($this->object->data);
     }
 
-    public function is_wiki_page()
+    public function get_page_type()
     {
-        return $this->get_mime_type() == 'text/plain';
+        $mime_type = $this->get_mime_type();
+        if ($mime_type == 'text/plain')
+            return self::TYPE_PAGE;
+        else if (strpos($mime_type, 'image/') === 0)
+            return self::TYPE_IMAGE;
+        else
+            return self::TYPE_BINARY;
     }
 
     public function get_mime_type()

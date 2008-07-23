@@ -47,11 +47,16 @@ $view->commit_id = sha1_hex($commit->getName());
 
 if ($action == 'view') // {{{1
 {
-    if (!$page->is_wiki_page())
-        $view->set_template('page-view-binary.php');
-    else
-        $view->set_template('page-view.php');
-
+    switch ($page->get_page_type())
+    {
+        case WikiPage::TYPE_PAGE:
+            $view->set_template('page-view.php');
+            break;
+        case WikiPage::TYPE_IMAGE: // Just fall through for now
+        case WikiPage::TYPE_BINARY:
+            $view->set_template('page-view-binary.php');
+            break;
+    }
     $view->display();
 }
 else if ($action == 'history') // {{{1
