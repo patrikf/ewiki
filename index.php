@@ -71,6 +71,9 @@ if ($action == 'view') // {{{1
                 array_push($view->entries, $obj);
             }
             break;
+        case NULL:
+            throw new Exception('No such page');
+            break;
     }
     $view->display();
 }

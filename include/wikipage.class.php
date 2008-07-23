@@ -9,10 +9,11 @@ class WikiPage
     public $path;
     public $object;
 
-    const TYPE_PAGE = 0;
-    const TYPE_IMAGE = 1;
-    const TYPE_BINARY = 2;
-    const TYPE_TREE = 3;
+    /* don't use 0 (<-> NULL) */
+    const TYPE_PAGE = 1;
+    const TYPE_IMAGE = 2;
+    const TYPE_BINARY = 3;
+    const TYPE_TREE = 4;
 
     public function __construct($path, $commit=NULL)
     {
@@ -69,7 +70,9 @@ class WikiPage
         if ($this->object instanceof GitTree)
             return self::TYPE_TREE;
         $mime_type = $this->get_mime_type();
-        if ($mime_type == 'text/plain')
+        if ($mime_type === NULL)
+            return NULL;
+        else if ($mime_type == 'text/plain')
             return self::TYPE_PAGE;
         else if (!strncmp($mime_type, 'image/', 6))
             return self::TYPE_IMAGE;
