@@ -1,7 +1,6 @@
 <?php
 
 error_reporting(E_ALL | E_STRICT);
-assert_options(ASSERT_BAIL, TRUE);
 
 set_include_path('include/');
 require_once('core.class.php');

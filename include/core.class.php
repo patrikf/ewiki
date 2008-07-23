@@ -143,9 +143,16 @@ class Core
     {
 	throw new Exception(self::format_error($errno, $msg, $file, $line));
     }
+
+    static function handle_assertion($file, $line)
+    {
+        throw new Exception(sprintf('failed assertion at %s:%d', $file, $line));
+    }
 }
 
 set_exception_handler(array('Core', 'handle_exception'));
 set_error_handler(array('Core', 'handle_error'));
+assert_options(ASSERT_CALLBACK, array('Core', 'handle_assertion'));
+assert_options(ASSERT_BAIL, 0); /* this would end the program without displaying anything */
 
 ?>
