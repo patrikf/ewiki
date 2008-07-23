@@ -31,29 +31,32 @@ $action = isset($_GET['action']) ? $_GET['action'] : '';
 if ($action == '')
     $action = 'view';
 
-if (isset($_GET['commit']))
-    $commit = sha1_bin($_GET['commit']);
-else
+$is_head = !isset($_GET['commit']);
+if ($is_head)
     $commit = $repo->getHead(Config::GIT_BRANCH);
+else
+    $commit = sha1_bin($_GET['commit']);
 $commit = $repo->getObject($commit);
 
 $page = WikiPage::from_url($parts[0], $commit);
 
+$view = new View;
+$view->page = $page;
+$view->action = $action;
+$view->commit_id = sha1_hex($commit->getName());
+
 if ($action == 'view') // {{{1
 {
     if (!$page->is_wiki_page())
-        $view = new View('page-view-binary.php');
+        $view->set_template('page-view-binary.php');
     else
-        $view = new View('page-view.php');
-    $view->page = $page;
-    $view->action = $action;
+        $view->set_template('page-view.php');
+
     $view->display();
 }
 else if ($action == 'history') // {{{1
 {
-    $view = new View('page-history.php');
-    $view->page = $page;
-    $view->action = $action;
+    $view->set_template('page-history.php');
 
     $history = array();
     $commits = array($repo->getHead(Config::GIT_BRANCH));
@@ -97,7 +100,7 @@ else if ($action == 'history') // {{{1
 }
 else if ($action == 'edit') // {{{1
 {
-    if (isset($_POST['content']))
+    if (isset($_POST['content'])) // {{{1
     {
 	$content = str_replace("\r", '', str_replace("\r\n", "\n", $_POST['content']));
 
@@ -177,17 +180,12 @@ else if ($action == 'edit') // {{{1
 	}
 	fclose($f);
         redirect($page->get_url());
-    }
+    } /// }}}1
 
-    $view = new View('page-edit.php');
-    $view->commit = sha1_hex($commit->getName());
+    $view->set_template('page-edit.php');
     $view->new = ($page->object === NULL);
-    $view->page = $page;
-    $view->action = $action;
     if (isset($content))
-    {
 	$view->content = $content;
-    }
     else
 	$view->content = ($view->new ? '' : $page->object->data);
 
