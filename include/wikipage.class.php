@@ -6,7 +6,10 @@ class PageNotFoundError extends InvalidPageError {}
 
 class WikiPage
 {
-    function __construct($path, $commit=NULL)
+    public $path;
+    public $object;
+
+    public function __construct($path, $commit=NULL)
     {
         global $repo;
         $this->path = $path;
@@ -22,7 +25,7 @@ class WikiPage
         }
     }
 
-    function get_url()
+    public function get_url()
     {
         $url = Config::PATH;
         foreach ($this->path as $part)
@@ -30,17 +33,29 @@ class WikiPage
         return $url;
     }
 
-    function get_name()
+    public function get_name()
     {
         return implode('/', $this->path);
     }
 
-    function format()
+    public function format()
     {
         return Markup::markup2html($this->object->data);
     }
 
-    static function from_url($name, $commit=NULL)
+    public function is_binary()
+    {
+        /* have a good guess */
+        for ($i = 0; $i < 32 && $i < strlen($this->object->data); $i++)
+        {
+            $c = ord($this->object->data{$i});
+            if ($c < 0x20 && $c != 10 /* \n */)
+                return TRUE;
+        }
+        return FALSE;
+    }
+
+    static public function from_url($name, $commit=NULL)
     {
         $path = array();
         $dir = FALSE;
@@ -59,7 +74,7 @@ class WikiPage
         return new WikiPage($path, $commit);
     }
 
-    static function find_page($commit, $path)
+    static public function find_page($commit, $path)
     {
         $cur = $commit->repo->getObject($commit->tree);
         while (count($path))

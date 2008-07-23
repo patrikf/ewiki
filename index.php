@@ -41,7 +41,10 @@ $page = WikiPage::from_url($parts[0], $commit);
 
 if ($action == 'view')
 {
-    $view = new View('page-view.php');
+    if ($page->is_binary())
+        $view = new View('page-view-binary.php');
+    else
+        $view = new View('page-view.php');
     $view->page = $page;
     $view->action = $action;
     $view->display();
