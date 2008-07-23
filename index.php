@@ -100,7 +100,7 @@ else if ($action == 'history') // {{{1
 }
 else if ($action == 'edit') // {{{1
 {
-    if (isset($_POST['content'])) // {{{1
+    if (isset($_POST['content'])) // {{{2
     {
 	$content = str_replace("\r", '', str_replace("\r\n", "\n", $_POST['content']));
 
@@ -180,7 +180,7 @@ else if ($action == 'edit') // {{{1
 	}
 	fclose($f);
         redirect($page->get_url());
-    } /// }}}1
+    } /// }}}2
 
     $view->set_template('page-edit.php');
     $view->new = ($page->object === NULL);
