@@ -46,6 +46,30 @@ class MIME
 
     protected function literal($filename)
     {
+        $pos = $this->uint32_at(12);
+        $n = $this->uint32_at($pos);
+
+        /* binary search */
+        $pos += 4;
+        $a = 0;
+        $span = $n;
+        while ($span > 0)
+        {
+            $cur = $a + (int)($span/2);
+            list($lit_off, $type_off) = $this->nuint32_at($pos + 8*$cur, 2);
+            $c = strcmp($filename, $this->string_at($lit_off));
+            if ($c == 0)
+                return $this->string_at($type_off);
+            else if ($span == 1)
+                break;
+            else if ($c < 0)
+                $span = (int)($span/2);
+            else
+            {
+                $a += (int)($span/2) + 1;
+                $span = (int)($span/2) - !($span%2);
+            }
+        }
         return NULL;
     }
 
