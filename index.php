@@ -13,6 +13,7 @@ require_once('git/git.class.php');
 require_once('markup.class.php');
 require_once('wikipage.class.php');
 require_once('view.class.php');
+require_once('mime.class.php');
 
 function redirect($uri)
 {
@@ -40,7 +41,7 @@ $page = WikiPage::from_url($parts[0], $commit);
 
 if ($action == 'view') // {{{1
 {
-    if ($page->is_binary())
+    if (!$page->is_wiki_page())
         $view = new View('page-view-binary.php');
     else
         $view = new View('page-view.php');
@@ -194,10 +195,7 @@ else if ($action == 'edit') // {{{1
 }
 else if ($action == 'get') // {{{1
 {
-    if ($page->is_binary())
-        header('Content-Type: application/octet-stream');
-    else
-        header('Content-Type: text/plain');
+    header('Content-Type: '.$page->get_mime_type());
     header('Content-Disposition: inline; filename="' . addcslashes($page->get_name(), '"') . '"');
     echo $page->object->data;
 } // }}}1

@@ -43,16 +43,17 @@ class WikiPage
         return Markup::markup2html($this->object->data);
     }
 
-    public function is_binary()
+    public function is_wiki_page()
     {
-        /* have a good guess */
-        for ($i = 0; $i < 32 && $i < strlen($this->object->data); $i++)
-        {
-            $c = ord($this->object->data{$i});
-            if ($c < 0x20 && $c != 10 /* \n */)
-                return TRUE;
-        }
-        return FALSE;
+        return $this->get_mime_type() == 'text/plain';
+    }
+
+    public function get_mime_type()
+    {
+        if (!$this->object)
+            return NULL;
+        $mime = new MIME;
+        return $mime->buffer_get_type($this->object->data, $this->get_name());
     }
 
     static public function from_url($name, $commit=NULL)
