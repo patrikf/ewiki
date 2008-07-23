@@ -73,6 +73,32 @@ class MIME
         return NULL;
     }
 
+    protected function suffix_tree($prefix, $pos, $filename)
+    {
+        list($n, $pos) = $this->nuint32_at($pos, 2);
+
+        for ($i = 0; $i < $n; $i++, $pos += 16)
+        {
+            list($c, $type_off) = $this->nuint32_at($pos, 2);
+            $cur = $prefix . chr($c); /* FIXME: make unicode-aware? */
+            $p = strrpos($filename, $cur);
+            if ($p === FALSE)
+                continue;
+            if ($type_off && $p == strlen($filename)-strlen($cur))
+                return $this->string_at($type_off);
+            $r = $this->suffix_tree($cur, $pos+8, $filename);
+            if ($r)
+                return $r;
+        }
+        return NULL;
+    }
+
+    protected function suffix($filename)
+    {
+        $pos = $this->uint32_at(16);
+        return $this->suffix_tree('', $pos, $filename);
+    }
+
     protected function glob($filename)
     {
         $pos = $this->uint32_at(20);
@@ -182,6 +208,9 @@ class MIME
                 return $r[0][1];
 
             $r = $this->literal($filename);
+            if ($r)
+                return $r;
+            $r = $this->suffix($filename);
             if ($r)
                 return $r;
             $r = $this->glob($filename);
