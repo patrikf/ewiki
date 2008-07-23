@@ -12,9 +12,13 @@ class WikiPage
     public function __construct($path, $commit=NULL)
     {
         global $repo;
-        $this->path = $path;
+        $this->path = array();
+        foreach ($path as $part)
+            if ($part != '')
+                array_push($this->path, $part);
         if ($commit === NULL)
             $commit = $repo->getObject($repo->getHead(Config::GIT_BRANCH));
+        $this->commit = $commit;
         try
         {
             $this->object = WikiPage::find_page($commit, $path);
@@ -30,12 +34,14 @@ class WikiPage
         $url = Config::PATH;
         foreach ($this->path as $part)
             $url .= '/' . strtr(str_replace('_', '%5F', urlencode($part)), '+', '_');
+        if ($this->is_tree())
+            $url .= '/';
         return $url;
     }
 
     public function get_name()
     {
-        return implode('/', $this->path);
+        return implode('/', $this->path).($this->is_tree() ? '/' : '');
     }
 
     public function format()
@@ -43,9 +49,24 @@ class WikiPage
         return Markup::markup2html($this->object->data);
     }
 
+    public function is_tree()
+    {
+        return ($this->object instanceof GitTree);
+    }
+
+    public function list_entries()
+    {
+        $entries = array();
+        foreach ($this->object->nodes as $node)
+        {
+            array_push($entries, new WikiPage(array_merge($this->path, array($node->name)), $this->commit));
+        }
+        return $entries;
+    }
+
     public function is_wiki_page()
     {
-        return $this->get_mime_type() == 'text/plain';
+        return (!$this->is_tree() && $this->get_mime_type() == 'text/plain');
     }
 
     public function get_mime_type()
@@ -78,15 +99,15 @@ class WikiPage
     static public function find_page($commit, $path)
     {
         $cur = $commit->repo->getObject($commit->tree);
-        while (count($path))
+        for (; count($path); array_shift($path))
         {
             if ($cur->getType() != Git::OBJ_TREE)
                 throw new InvalidTreeError;
             if ($path[0] == '')
-                break;
+                continue;
             if (!isset($cur->nodes[$path[0]]))
                 throw new PageNotFoundError;
-            $cur = $commit->repo->getObject($cur->nodes[array_shift($path)]->object);
+            $cur = $commit->repo->getObject($cur->nodes[$path[0]]->object);
         }
         return $cur;
     }

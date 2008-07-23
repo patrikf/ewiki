@@ -37,17 +37,31 @@ if ($is_head)
 else
     $commit = sha1_bin($_GET['commit']);
 $commit = $repo->getObject($commit);
+$commit_id = sha1_hex($commit->getName());
 
 $page = WikiPage::from_url($parts[0], $commit);
 
 $view = new View;
 $view->page = $page;
 $view->action = $action;
-$view->commit_id = sha1_hex($commit->getName());
+$view->commit_id = $commit_id;
 
 if ($action == 'view') // {{{1
 {
-    if (!$page->is_wiki_page())
+    if ($page->is_tree())
+    {
+        $view->set_template('page-view-tree.php');
+
+        $view->entries = array();
+        foreach ($page->list_entries() as $entry)
+        {
+            $obj = new stdClass;
+            $obj->url = $entry->get_url() . ($is_head ? '' : '?commit='.$commit_id);
+            $obj->name = $entry->get_name();
+            array_push($view->entries, $obj);
+        }
+    }
+    else if (!$page->is_wiki_page())
         $view->set_template('page-view-binary.php');
     else
         $view->set_template('page-view.php');
