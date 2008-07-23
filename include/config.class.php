@@ -22,5 +22,12 @@ final class Config
 
     // The time zone of the wiki
     const TIMEZONE = 'GMT';
+
+    // The default maximum image width
+    const IMAGE_WIDTH = 640;
+
+    // The default maximum image height
+    const IMAGE_HEIGHT = 480;
+
 }
 
