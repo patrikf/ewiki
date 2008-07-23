@@ -195,6 +195,7 @@ else if ($action == 'get') // {{{1
 {
     header('Content-Type: '.$page->get_mime_type());
     header('Content-Disposition: inline; filename="' . addcslashes($page->get_name(), '"') . '"');
+    header('Content-Length: '.strlen($page->object->data));
     echo $page->object->data;
 } // }}}1
 
