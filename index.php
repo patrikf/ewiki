@@ -156,7 +156,7 @@ else if ($action == 'edit') // {{{1
 	$newcommit->author = $stamp;
 	$newcommit->committer = $stamp;
 
-	$newcommit->summary = $_POST['summary'];
+	$newcommit->summary = sprintf('%s: %s', $page->getName(), $_POST['summary']);
 	$newcommit->detail = '';
 	$newcommit->rehash();
 
@@ -177,16 +177,18 @@ else if ($action == 'edit') // {{{1
 	}
 	fclose($f);
         redirect($page->getURL());
-    } /// }}}2
+    }
+    else // {{{2
+    {
+        $view->setTemplate('page-edit.php');
+        $view->new = ($page->object === NULL);
+        if (isset($content))
+            $view->content = $content;
+        else
+            $view->content = ($view->new ? '' : $page->object->data);
 
-    $view->setTemplate('page-edit.php');
-    $view->new = ($page->object === NULL);
-    if (isset($content))
-	$view->content = $content;
-    else
-	$view->content = ($view->new ? '' : $page->object->data);
-
-    $view->display();
+        $view->display();
+    } // }}}2
 }
 else if ($action == 'get') // {{{1
 {
