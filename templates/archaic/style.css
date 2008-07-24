@@ -53,7 +53,8 @@ body
 }
 #pagelinks a { margin: 0px 0px 0px 1em; }
 
-p
+p,
+div.par
 {
     margin: .75em 0px;
     line-height: 1.5;
@@ -125,5 +126,11 @@ table.history
     width: 100%;
     border: 1px solid #000;
     padding: .25em;
+}
+
+#edit-form input.submit
+{
+    display: block;
+    margin: .75em 0px .75em auto;
 }
 

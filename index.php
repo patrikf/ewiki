@@ -99,7 +99,10 @@ else if ($action == 'edit') // {{{1
 {
     if (isset($_POST['content'])) // {{{2
     {
-	$content = str_replace("\r", '', str_replace("\r\n", "\n", $_POST['content']));
+        if ($_POST['type'] == 'file')
+            $content = file_get_contents($_FILES['file']['tmp_name']);
+        else
+            $content = str_replace("\r", '', str_replace("\r\n", "\n", $_POST['content']));
 
 	/* first, create all new objects in memory */
 	/* pending: contains all objects that need to be written */
@@ -181,11 +184,12 @@ else if ($action == 'edit') // {{{1
     else // {{{2
     {
         $view->setTemplate('page-edit.php');
-        $view->new = ($page->object === NULL);
+        $view->page_type = $page->getPageType();
+        $view->is_binary = $view->page_type == WikiPage::TYPE_BINARY || $view->page_type == WikiPage::TYPE_IMAGE;
         if (isset($content))
             $view->content = $content;
         else
-            $view->content = ($view->new ? '' : $page->object->data);
+            $view->content = ($view->page_type == WikiPage::TYPE_PAGE ? $page->object->data : '');
 
         $view->display();
     } // }}}2
