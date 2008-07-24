@@ -196,6 +196,17 @@ class MIME
         return $r;
     }
 
+    protected function bufGuessBinary(&$buf)
+    {
+        for ($i = 0; $i < 32 && $i < strlen($buf); $i++)
+        {
+            $c = ord($buf{$i});
+            if ($c < 0x20 && $c != 10 /* \n */)
+                return TRUE;
+        }
+        return FALSE;
+    }
+
     public function bufferGetType($buf, $filename=NULL)
     {
         if ($filename)
@@ -217,25 +228,29 @@ class MIME
             if ($r)
                 return $r;
 
-            $r = $this->bufMagic($buf, 0, 79);
-            if (count($r))
-                return $r[0][1];
+            $is_binary = $this->bufGuessBinary($buf);
+            /*
+             * Checking all magic signatures is a very expensive operation.
+             * We trade off some accuracy for faster text/plain recognition.
+             */
+            if ($is_binary)
+            {
+                $r = $this->bufMagic($buf, 0, 79);
+                if (count($r))
+                    return $r[0][1];
+            }
         }
         else
         {
-            $r = $this->bufMagic($buf);
+            $is_binary = $this->bufGuessBinary($buf);
+            if ($is_binary)
+                $r = $this->bufMagic($buf);
+            else
+                $r = $this->bufMagic($buf, 80);
             if (count($r))
                 return $r[0][1];
         }
-
-        /* have a guess */
-        for ($i = 0; $i < 32 && $i < strlen($buf); $i++)
-        {
-            $c = ord($buf{$i});
-            if ($c < 0x20 && $c != 10 /* \n */)
-                return 'application/octet-stream';
-        }
-        return 'text/plain';
+        return $is_binary ? 'application/octet-stream' : 'text/plain';
     }
 };
 
