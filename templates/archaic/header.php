@@ -12,6 +12,7 @@
 <div id="linkpane">
     <div id="globallinks">
         <a href="<?= Config::PATH ?>/">home</a>
+        <a href="<?= Config::PATH ?>/:recent">recent changes</a>
     </div>
     <div id="pagelinks">
     <?php foreach (array('view', 'edit', 'history') as $i): ?>
