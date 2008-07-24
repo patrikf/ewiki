@@ -1,3 +1,4 @@
+<?php $title = $page->getName(); ?>
 <?php include('header.php'); ?>
 <h1 id="pagetitle"><?= Markup::escape($page->getName()); ?></h1>
 <form id="edit-form" enctype="multipart/form-data" accept-charset="UTF-8" method="post" action="<?= $page->getURL() ?>?action=edit&amp;commit=<?= $commit_id ?>">

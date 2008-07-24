@@ -1,3 +1,4 @@
+<?php $title = $page->getName(); ?>
 <?php include('header.php'); ?>
 <h1 id="pagetitle" class="new"><?= Markup::escape($page->getName()) ?></h1>
 <p>

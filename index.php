@@ -27,9 +27,7 @@ $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
 assert(!strncmp($parts[0], Config::PATH, strlen(Config::PATH)));
 $parts[0] = substr($parts[0], strlen(Config::PATH));
 
-$action = isset($_GET['action']) ? $_GET['action'] : '';
-if ($action == '')
-    $action = 'view';
+$view = new View;
 
 $is_head = !isset($_GET['commit']);
 if ($is_head)
@@ -38,15 +36,96 @@ else
     $commit = sha1_bin($_GET['commit']);
 $commit = $repo->getObject($commit);
 $commit_id = sha1_hex($commit->getName());
-
-$page = WikiPage::fromURL($parts[0], $commit);
-
-$view = new View;
-$view->page = $page;
-$view->action = $action;
 $view->commit_id = $commit_id;
 
-if ($action == 'view') // {{{1
+$special = $page = NULL;
+if (!strncmp($parts[0], '/:', 2))
+    $special = substr($parts[0], 2);
+else
+{
+    $action = isset($_GET['action']) ? $_GET['action'] : '';
+    if ($action == '')
+        $action = 'view';
+    $view->action = $action;
+
+    $page = WikiPage::fromURL($parts[0], $commit);
+    $view->page = $page;
+}
+
+if ($special == 'recent') // {{{1
+{
+    $view->setTemplate('recent-changes.php');
+
+    $commits = array();
+    $history = array_reverse($commit->getHistory());
+    for ($i = 0; $i < min(10, count($history)); $i++)
+    {
+        $cur = $history[$i];
+
+        $commits[$i] = new stdClass;
+        $commits[$i]->commit_id = sha1_hex($cur->getName());
+        $commits[$i]->summary = $cur->summary;
+        $commits[$i]->detail = $cur->detail;
+
+        if ($i+1 < count($history))
+            $prev = $history[$i+1];
+        else
+            $prev = NULL;
+
+        $prev_files = $prev ? $prev->repo->getObject($prev->tree)->listRecursive() : array();
+        $cur_files = $cur->repo->getObject($cur->tree)->listRecursive();
+        $changes = array();
+
+        sort($prev_files);
+        sort($cur_files);
+        $a = $b = 0;
+        while ($a < count($prev_files) || $b < count($cur_files))
+        {
+            if ($a < count($prev_files) && $b < count($cur_files))
+                $cmp = strcmp($prev_files[$a], $cur_files[$b]);
+            else
+                $cmp = 0;
+            $change = new stdClass;
+            if ($b >= count($cur_files) || $cmp < 0)
+            {
+                $change->type = 'removed';
+                $change->subject = $prev_files[$a];
+                array_push($changes, $change);
+                $a++;
+            }
+            else if ($a >= count($prev_files) || $cmp > 0)
+            {
+                $change->type = 'added';
+                $change->subject = $cur_files[$b];
+                array_push($changes, $change);
+                $b++;
+            }
+            else
+            {
+                if ($prev->find($prev_files[$a]) != $cur->find($cur_files[$b]))
+                {
+                    $change->type = 'modified';
+                    $change->subject = $prev_files[$a];
+                    array_push($changes, $change);
+                }
+                $a++;
+                $b++;
+            }
+        }
+        foreach ($changes as $change)
+        {
+            $page = new WikiPage($change->subject);
+            $change->subject_url = $page->getURL();
+        }
+        $commits[$i]->changes = $changes;
+    }
+    $view->commits = $commits;
+
+    $view->display();
+}
+else if ($special !== NULL) // {{{1
+    throw new Exception(sprintf('unknown special: %s', $special));
+else if ($action == 'view') // {{{1
 {
     switch ($page->getPageType())
     {

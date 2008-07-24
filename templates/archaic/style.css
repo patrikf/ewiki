@@ -139,3 +139,27 @@ table.history
     display: none;
 }
 
+.sha1
+{
+    font-family: monospace;
+    font-size: .7em;
+    color: #AAA;
+}
+
+div.commits .commit
+{
+    margin: .75em 0px;
+    line-height: 1.2;
+}
+
+div.commits .commit .summary
+{
+    font-weight: bold;
+}
+
+div.commits .commit .changes
+{
+    font-family: monospace;
+    font-size: .8em;
+}
+
