@@ -29,7 +29,7 @@ class WikiPage
         {
             $this->object = WikiPage::find_page($commit, $path);
         }
-        catch (InvalidPageError $e)
+        catch (PageNotFoundError $e)
         {
             $this->object = NULL;
         }
@@ -112,7 +112,7 @@ class WikiPage
         $cur = $commit->repo->getObject($commit->tree);
         for (; count($path); array_shift($path))
         {
-            if ($cur->getType() != Git::OBJ_TREE)
+            if (!($cur instanceof GitTree))
                 throw new InvalidTreeError;
             if ($path[0] == '')
                 continue;
