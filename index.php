@@ -212,7 +212,11 @@ else if ($action == 'image') // {{{1
         // Resize (oh god why does php not have a simple image_resize function?)
         $old_image = imagecreatefromstring($page->object->data);
         $old_size = array(imagesx($old_image), imagesy($old_image));
-        $new_size = array((int)$_GET['width'] || $old_size[0], (int)$_GET['width'] || $old_size[1]);
+        $new_size = array((int)$_GET['width'], (int)$_GET['width']);
+        if (!$new_size[0])
+            $new_size[0] = $old_size[0];
+        if (!$new_size[1])
+            $new_size[1] = $old_size[1];
         $factor = min($new_size[0] / $old_size[0], $new_size[1] / $old_size[1]); // Keep aspect ratio
         if ($factor < 1)
         {
