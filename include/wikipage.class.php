@@ -1,8 +1,5 @@
 <?php
 
-class InvalidPageError extends Exception {}
-class InvalidTreeError extends InvalidPageError {}
-class PageNotFoundError extends InvalidPageError {}
 
 class WikiPage
 {
@@ -21,6 +18,8 @@ class WikiPage
     {
         global $repo;
         $this->path = array();
+        if (!is_array($path))
+            $path = explode('/', $path);
         foreach ($path as $part)
             if ($part != '')
                 array_push($this->path, $part);
@@ -29,9 +28,9 @@ class WikiPage
         $this->commit = $commit;
         try
         {
-            $this->object = WikiPage::findPage($commit, $path);
+            $this->object = $commit->repo->getObject($commit->find($path));
         }
-        catch (PageNotFoundError $e)
+        catch (GitTreeNotFoundError $e)
         {
             $this->object = NULL;
         }
@@ -113,22 +112,6 @@ class WikiPage
         return new WikiPage($path, $commit);
     }
 
-    static public function findPage($commit, $path)
-    {
-        $cur = $commit->repo->getObject($commit->tree);
-        for (; count($path); array_shift($path))
-        {
-            if (!($cur instanceof GitTree))
-                throw new InvalidTreeError;
-            if ($path[0] == '')
-                continue;
-            if (!isset($cur->nodes[$path[0]]))
-                throw new PageNotFoundError;
-            $cur = $commit->repo->getObject($cur->nodes[$path[0]]->object);
-        }
-        return $cur;
-    }
-
     public function getPageHistory()
     {
         $commits = $this->commit->getHistory();
@@ -140,7 +123,7 @@ class WikiPage
             $entry->commit = $commit;
             try
             {
-                $entry->blob = WikiPage::findPage($commit, $this->path);
+                $entry->blob = $commit->repo->getObject($commit->find($this->path));
                 $blobname = $entry->blob->getName();
             }
             catch (InvalidPageError $e)
