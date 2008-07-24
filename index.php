@@ -194,7 +194,7 @@ else if ($action == 'get') // {{{1
     header('Content-Length: '.strlen($page->object->data));
     echo $page->object->data;
 }
-else if ($action == 'image') // {{{ 1
+else if ($action == 'image') // {{{1
 {
     assert($page->getPageType() == WikiPage::TYPE_IMAGE);
     header('Content-Type: '.$page->getMimeType());
@@ -203,24 +203,19 @@ else if ($action == 'image') // {{{ 1
     if (isset($_GET['width']) || isset($_GET['height']))
     {
         // Resize (oh god why does php not have a simple image_resize function?)
-        $new_size = array((int)$_GET['width'], (int)$_GET['width']);
-        if ($new_size[0] < 10)
-            $new_size[0] = Config::IMAGE_WIDTH;
-        if ($new_size[1] < 10)
-            $new_size[1] = Config::IMAGE_HEIGHT;
         $old_image = imagecreatefromstring($page->object->data);
         $old_size = array(imagesx($old_image), imagesy($old_image));
+        $new_size = array((int)$_GET['width'] || $old_size[0], (int)$_GET['width'] || $old_size[1]);
         $factor = min($new_size[0] / $old_size[0], $new_size[1] / $old_size[1]); // Keep aspect ratio
         if ($factor < 1)
         {
-            $new_size = array((int)$old_size[0] * $factor, (int)$old_size[1] * $factor);
+            $new_size = array((int)($old_size[0] * $factor), (int)($old_size[1] * $factor));
             $new_image = imagecreatetruecolor($new_size[0], $new_size[1]);
             imagecopyresampled($new_image, $old_image, 0, 0, 0, 0, $new_size[0], $new_size[1], $old_size[0], $old_size[1]);
             imagedestroy($old_image);
         }
         else
             $new_image = $old_image; // No resize if image already has the right size or is smaller than wanted size
-        unset($factor, $old_size, $new_size, $old_image);
 
         // Send the image
         switch ($page->getMimeType())
@@ -240,11 +235,13 @@ else if ($action == 'image') // {{{ 1
             case 'image/x-xbitmap':
                 imagexbm($new_image);
                 break;
+            default:
+                throw new Exception(sprintf('unhandled image type: %s', $page->getMimeType()));
         }
         imagedestroy($new_image);
     }
     else
-            echo $page->object->data;
+        echo $page->object->data;
 
 } // }}}1
 
