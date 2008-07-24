@@ -17,7 +17,7 @@
 </div>
 
 <div class="par">
-    <input type="radio" name="type" value="file" class="form-opt" id="page-opt"<?= !$is_binary ? ' checked="checked"' : '' ?> /><label for="page-opt">
+    <input type="radio" name="type" value="page" class="form-opt" id="page-opt"<?= !$is_binary ? ' checked="checked"' : '' ?> /><label for="page-opt">
     <? if (!$page_type): ?>
     Create a new wiki page
     <? elseif ($page_type == WikiPage::TYPE_PAGE): ?>
