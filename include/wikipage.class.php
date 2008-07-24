@@ -9,6 +9,7 @@ class WikiPage
     public $path;
     public $object;
     protected $commit;
+    protected $mime_type = NULL;
 
     /* don't use 0 (<-> NULL) */
     const TYPE_PAGE = 1;
@@ -85,8 +86,12 @@ class WikiPage
     {
         if (!$this->object)
             return NULL;
-        $mime = new MIME;
-        return $mime->bufferGetType($this->object->data, $this->getName());
+        if (!$this->mime_type)
+        {
+            $mime = new MIME;
+            $this->mime_type = $mime->bufferGetType($this->object->data, $this->getName());
+        }
+        return $this->mime_type;
     }
 
     static public function fromURL($name, $commit=NULL)
