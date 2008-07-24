@@ -245,6 +245,8 @@ else if ($action == 'image') // {{{1
         echo $page->object->data;
 
 } // }}}1
+else
+    throw new Exception(sprintf('unhandled action: %s', $action));
 
 /* vim:set fdm=marker fmr={{{,}}}: */
 
