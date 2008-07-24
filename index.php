@@ -81,43 +81,16 @@ else if ($action == 'history') // {{{1
 {
     $view->set_template('page-history.php');
 
-    $history = array();
-    $commits = array($repo->getHead(Config::GIT_BRANCH));
-    while (($commit = array_shift($commits)) !== NULL)
-    {
-	$commit = $repo->getObject($commit);
-	$commits += $commit->parents;
-
-	$entry = new stdClass;
-	array_push($history, $entry);
-	$entry->commit = $commit->getName();
-	try
-	{
-	    $entry->blob = WikiPage::find_page($commit, $page->path)->getName();
-	}
-	catch (InvalidPageError $e)
-	{
-	    $entry->blob = NULL;
-	}
-	$entry->summary = $commit->summary;
-	$entry->author = $commit->author->name;
-	$entry->time = $commit->committer->time;
-    }
-    usort($history, create_function('$a,$b', 'return ($b->time - $a->time);'));
-    $oldblob = NULL;
-    for ($i = count($history)-1; $i >= 0; $i--)
-    {
-	if ($history[$i]->blob == $oldblob)
-	    array_splice($history, $i, 1);
-	else
-	    $oldblob = $history[$i]->blob;
-    }
+    $history = $page->getPageHistory();
     foreach ($history as $entry)
     {
-	$entry->commit = sha1_hex($entry->commit);
-	$entry->blob = sha1_hex($entry->blob);
+        $entry->summary = $entry->commit->summary;
+        $entry->author = $entry->commit->author->name;
+        $entry->time = $entry->commit->committer->time;
+	$entry->commit = sha1_hex($entry->commit->getName());
+	$entry->blob = $entry->blob ? sha1_hex($entry->blob->getName()) : NULL;
     }
-    $view->history = $history;
+    $view->history = array_reverse($history);
 
     $view->display();
 }

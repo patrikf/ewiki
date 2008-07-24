@@ -8,6 +8,7 @@ class WikiPage
 {
     public $path;
     public $object;
+    protected $commit;
 
     /* don't use 0 (<-> NULL) */
     const TYPE_PAGE = 1;
@@ -121,6 +122,32 @@ class WikiPage
             $cur = $commit->repo->getObject($cur->nodes[$path[0]]->object);
         }
         return $cur;
+    }
+
+    public function getPageHistory()
+    {
+        $commits = $this->commit->getHistory();
+        $history = array();
+        $lastblob = NULL;
+        foreach ($commits as $commit)
+        {
+            $entry = new stdClass;
+            $entry->commit = $commit;
+            try
+            {
+                $entry->blob = WikiPage::find_page($commit, $this->path);
+                $blobname = $entry->blob->getName();
+            }
+            catch (InvalidPageError $e)
+            {
+                $entry->blob = NULL;
+                $blobname = NULL;
+            }
+            if ($blobname != $lastblob)
+                array_push($history, $entry);
+            $lastblob = $blobname;
+        }
+        return $history;
     }
 }
 
