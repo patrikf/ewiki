@@ -134,3 +134,8 @@ table.history
     margin: .75em 0px .75em auto;
 }
 
+.hidden
+{
+    display: none;
+}
+
