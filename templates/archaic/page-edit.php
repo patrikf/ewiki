@@ -22,7 +22,7 @@
     Create a new wiki page
     <? elseif ($page_type == WikiPage::TYPE_PAGE): ?>
     Edit page
-    <? elseif ($page_type == WikiPage::TYPE_PAGE): ?>
+    <? else: ?>
     Create a new wiki page, replacing existing content
     <? endif; ?>
     </label>
