@@ -72,7 +72,8 @@ if ($action == 'view') // {{{1
             }
             break;
         case NULL:
-            throw new Exception('No such page');
+            $view->setTemplate('page-new.php');
+            $view->has_history = !!count($page->getPageHistory());
             break;
     }
     $view->display();
