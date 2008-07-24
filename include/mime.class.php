@@ -73,7 +73,7 @@ class MIME
         return NULL;
     }
 
-    protected function suffix_tree($prefix, $pos, $filename)
+    protected function suffixTree($prefix, $pos, $filename)
     {
         list($n, $pos) = $this->nuint32_at($pos, 2);
 
@@ -86,7 +86,7 @@ class MIME
                 continue;
             if ($type_off && $p == strlen($filename)-strlen($cur))
                 return $this->string_at($type_off);
-            $r = $this->suffix_tree($cur, $pos+8, $filename);
+            $r = $this->suffixTree($cur, $pos+8, $filename);
             if ($r)
                 return $r;
         }
@@ -96,7 +96,7 @@ class MIME
     protected function suffix($filename)
     {
         $pos = $this->uint32_at(16);
-        return $this->suffix_tree('', $pos, $filename);
+        return $this->suffixTree('', $pos, $filename);
     }
 
     protected function glob($filename)
@@ -125,7 +125,7 @@ class MIME
             array_splice($a, $i, $word, array_reverse(array_slice($a, $i, $word)));
     }
 
-    protected function buf_matchlet(&$buf, $pos)
+    protected function bufMatchlet(&$buf, $pos)
     {
         list($off, $range, $word_size, $len, $value_off, $mask_off, $n_child, $child_off)
             = $this->nuint32_at($pos, 8);
@@ -158,24 +158,24 @@ class MIME
                 if ($c != $value[$i])
                     continue 2;
             }
-            return $this->buf_matchlets($buf, $child_off, $n_child);
+            return $this->bufMatchlets($buf, $child_off, $n_child);
         }
         return FALSE;
     }
 
-    protected function buf_matchlets(&$buf, $pos, $n)
+    protected function bufMatchlets(&$buf, $pos, $n)
     {
         $m = TRUE;
         for ($j = 0; $j < $n; $j++, $pos += 32)
         {
-            $m = $this->buf_matchlet($buf, $pos);
+            $m = $this->bufMatchlet($buf, $pos);
             if ($m)
                 break;
         }
         return $m;
     }
 
-    protected function buf_magic(&$buf, $pri_min=0, $pri_max=-1)
+    protected function bufMagic(&$buf, $pri_min=0, $pri_max=-1)
     {
         $pos = $this->uint32_at(24);
         list($n, $max_extent, $pos) = $this->nuint32_at($pos, 3);
@@ -190,20 +190,20 @@ class MIME
             if ($pri_max >= 0 && $pri > $pri_max)
                 continue;
 
-            if ($this->buf_matchlets($buf, $matchlets_off, $n_matchlets))
+            if ($this->bufMatchlets($buf, $matchlets_off, $n_matchlets))
                 array_push($r, array($pri, $this->string_at($type_off)));
         }
         return $r;
     }
 
-    public function buffer_get_type($buf, $filename=NULL)
+    public function bufferGetType($buf, $filename=NULL)
     {
         if ($filename)
             $filename = basename($filename);
 
         if ($filename)
         {
-            $r = $this->buf_magic($buf, 80);
+            $r = $this->bufMagic($buf, 80);
             if (count($r))
                 return $r[0][1];
 
@@ -217,13 +217,13 @@ class MIME
             if ($r)
                 return $r;
 
-            $r = $this->buf_magic($buf, 0, 79);
+            $r = $this->bufMagic($buf, 0, 79);
             if (count($r))
                 return $r[0][1];
         }
         else
         {
-            $r = $this->buf_magic($buf);
+            $r = $this->bufMagic($buf);
             if (count($r))
                 return $r[0][1];
         }

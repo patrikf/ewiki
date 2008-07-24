@@ -39,7 +39,7 @@ else
 $commit = $repo->getObject($commit);
 $commit_id = sha1_hex($commit->getName());
 
-$page = WikiPage::from_url($parts[0], $commit);
+$page = WikiPage::fromURL($parts[0], $commit);
 
 $view = new View;
 $view->page = $page;
@@ -48,26 +48,26 @@ $view->commit_id = $commit_id;
 
 if ($action == 'view') // {{{1
 {
-    switch ($page->get_page_type())
+    switch ($page->getPageType())
     {
         case WikiPage::TYPE_PAGE:
-            $view->set_template('page-view.php');
+            $view->setTemplate('page-view.php');
             break;
         case WikiPage::TYPE_IMAGE:
-            $view->set_template('page-view-image.php');
+            $view->setTemplate('page-view-image.php');
             break;
         case WikiPage::TYPE_BINARY:
-            $view->set_template('page-view-binary.php');
+            $view->setTemplate('page-view-binary.php');
             break;
         case WikiPage::TYPE_TREE:
-            $view->set_template('page-view-tree.php');
+            $view->setTemplate('page-view-tree.php');
 
             $view->entries = array();
-            foreach ($page->list_entries() as $entry)
+            foreach ($page->listEntries() as $entry)
             {
                 $obj = new stdClass;
-                $obj->url = $entry->get_url() . ($is_head ? '' : '?commit='.$commit_id);
-                $obj->name = $entry->get_name();
+                $obj->url = $entry->getURL() . ($is_head ? '' : '?commit='.$commit_id);
+                $obj->name = $entry->getName();
                 array_push($view->entries, $obj);
             }
             break;
@@ -79,7 +79,7 @@ if ($action == 'view') // {{{1
 }
 else if ($action == 'history') // {{{1
 {
-    $view->set_template('page-history.php');
+    $view->setTemplate('page-history.php');
 
     $history = $page->getPageHistory();
     foreach ($history as $entry)
@@ -175,10 +175,10 @@ else if ($action == 'edit') // {{{1
 	    throw new Exception('fast-forward merge not possible');
 	}
 	fclose($f);
-        redirect($page->get_url());
+        redirect($page->getURL());
     } /// }}}2
 
-    $view->set_template('page-edit.php');
+    $view->setTemplate('page-edit.php');
     $view->new = ($page->object === NULL);
     if (isset($content))
 	$view->content = $content;
@@ -189,16 +189,16 @@ else if ($action == 'edit') // {{{1
 }
 else if ($action == 'get') // {{{1
 {
-    header('Content-Type: '.$page->get_mime_type());
-    header('Content-Disposition: inline; filename="' . addcslashes($page->get_name(), '"') . '"');
+    header('Content-Type: '.$page->getMimeType());
+    header('Content-Disposition: inline; filename="' . addcslashes($page->getName(), '"') . '"');
     header('Content-Length: '.strlen($page->object->data));
     echo $page->object->data;
 }
 else if ($action == 'image') // {{{ 1
 {
-    assert($page->get_page_type() == WikiPage::TYPE_IMAGE);
-    header('Content-Type: '.$page->get_mime_type());
-    header('Content-Disposition: inline; filename="' . addcslashes($page->get_name(), '"') . '"');
+    assert($page->getPageType() == WikiPage::TYPE_IMAGE);
+    header('Content-Type: '.$page->getMimeType());
+    header('Content-Disposition: inline; filename="' . addcslashes($page->getName(), '"') . '"');
 
     if (isset($_GET['width']) || isset($_GET['height']))
     {
@@ -223,7 +223,7 @@ else if ($action == 'image') // {{{ 1
         unset($factor, $old_size, $new_size, $old_image);
 
         // Send the image
-        switch ($page->get_mime_type())
+        switch ($page->getMimeType())
         {
             case 'image/gif':
                 imagegif($new_image);

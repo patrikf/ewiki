@@ -2,7 +2,7 @@
 
 class Markup
 {
-    private static function parse_link_target($ref)
+    private static function parseLinkTarget($ref)
     {
         $ref = strtr($ref, "\n", ' ');
         $parts = explode(':', $ref, 2);
@@ -17,7 +17,7 @@ class Markup
         {
             $page = new WikiPage(explode('/', $ref));
             $valid = ($page->object !== NULL);
-            $url = $page->get_url();
+            $url = $page->getURL();
         }
         return array($url, $ref, $valid);
     }
@@ -78,7 +78,7 @@ class Markup
                 $in = substr($in, 2);
                 $target = '';
                 Markup::parse($in, $target, 'link_target');
-                list($url, $caption, $valid) = Markup::parse_link_target($target);
+                list($url, $caption, $valid) = Markup::parseLinkTarget($target);
                 $out .= '<a href="' . htmlspecialchars($url, 0, 'UTF-8') . '"';
                 if (!$valid)
                     $out .= ' class="new"';
@@ -163,7 +163,7 @@ class Markup
         }
     }
 
-    public static function markup2html($in)
+    public static function format($in)
     {
         $out = '';
         Markup::parse(&$in, &$out, NULL);

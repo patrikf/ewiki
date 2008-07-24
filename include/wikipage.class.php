@@ -28,7 +28,7 @@ class WikiPage
         $this->commit = $commit;
         try
         {
-            $this->object = WikiPage::find_page($commit, $path);
+            $this->object = WikiPage::findPage($commit, $path);
         }
         catch (PageNotFoundError $e)
         {
@@ -36,7 +36,7 @@ class WikiPage
         }
     }
 
-    public function get_url()
+    public function getURL()
     {
         $url = Config::PATH;
         foreach ($this->path as $part)
@@ -46,17 +46,17 @@ class WikiPage
         return $url;
     }
 
-    public function get_name()
+    public function getName()
     {
         return implode('/', $this->path).($this->object instanceof GitTree ? '/' : '');
     }
 
     public function format()
     {
-        return Markup::markup2html($this->object->data);
+        return Markup::format($this->object->data);
     }
 
-    public function list_entries()
+    public function listEntries()
     {
         $entries = array();
         foreach ($this->object->nodes as $node)
@@ -66,11 +66,11 @@ class WikiPage
         return $entries;
     }
 
-    public function get_page_type()
+    public function getPageType()
     {
         if ($this->object instanceof GitTree)
             return self::TYPE_TREE;
-        $mime_type = $this->get_mime_type();
+        $mime_type = $this->getMimeType();
         if ($mime_type === NULL)
             return NULL;
         else if ($mime_type == 'text/plain')
@@ -81,15 +81,15 @@ class WikiPage
             return self::TYPE_BINARY;
     }
 
-    public function get_mime_type()
+    public function getMimeType()
     {
         if (!$this->object)
             return NULL;
         $mime = new MIME;
-        return $mime->buffer_get_type($this->object->data, $this->get_name());
+        return $mime->bufferGetType($this->object->data, $this->getName());
     }
 
-    static public function from_url($name, $commit=NULL)
+    static public function fromURL($name, $commit=NULL)
     {
         $path = array();
         $dir = FALSE;
@@ -108,7 +108,7 @@ class WikiPage
         return new WikiPage($path, $commit);
     }
 
-    static public function find_page($commit, $path)
+    static public function findPage($commit, $path)
     {
         $cur = $commit->repo->getObject($commit->tree);
         for (; count($path); array_shift($path))
@@ -135,7 +135,7 @@ class WikiPage
             $entry->commit = $commit;
             try
             {
-                $entry->blob = WikiPage::find_page($commit, $this->path);
+                $entry->blob = WikiPage::findPage($commit, $this->path);
                 $blobname = $entry->blob->getName();
             }
             catch (InvalidPageError $e)

@@ -59,7 +59,7 @@ class Core
 	}
     }
 
-    static function format_exception($e)
+    static function formatException($e)
     {
 	$s = 'Uncaught Exception ('.get_class($e).")\n";
 	$s .= "\n";
@@ -95,7 +95,7 @@ class Core
 	return $s;
     }
 
-    static function fail_plaintext($msg)
+    static function failPlaintext($msg)
     {
 	while (ob_get_level() > 0)
 	    ob_end_clean();
@@ -114,7 +114,7 @@ class Core
 	exit(1);
     }
 
-    static function format_error($errno, $msg, $file, $line)
+    static function formatError($errno, $msg, $file, $line)
     {
 	$name = array(
 		E_WARNING => 'Warning',
@@ -134,25 +134,25 @@ class Core
 	return $s;
     }
 
-    static function handle_exception($e)
+    static function handleException($e)
     {
-	self::fail_plaintext(self::format_exception($e));
+	self::failPlaintext(self::formatException($e));
     }
 
-    static function handle_error($errno, $msg, $file, $line)
+    static function handleError($errno, $msg, $file, $line)
     {
-	throw new Exception(self::format_error($errno, $msg, $file, $line));
+	throw new Exception(self::formatError($errno, $msg, $file, $line));
     }
 
-    static function handle_assertion($file, $line)
+    static function handleAssertion($file, $line)
     {
         throw new Exception(sprintf('failed assertion at %s:%d', $file, $line));
     }
 }
 
-set_exception_handler(array('Core', 'handle_exception'));
-set_error_handler(array('Core', 'handle_error'));
-assert_options(ASSERT_CALLBACK, array('Core', 'handle_assertion'));
+set_exception_handler(array('Core', 'handleException'));
+set_error_handler(array('Core', 'handleError'));
+assert_options(ASSERT_CALLBACK, array('Core', 'handleAssertion'));
 assert_options(ASSERT_BAIL, 0); /* this would end the program without displaying anything */
 
 ?>

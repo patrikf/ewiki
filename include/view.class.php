@@ -10,7 +10,7 @@ class View
     function __isset($name) { isset($this->dict[$name]); }
     function __unset($name) { unset($this->dict[$name]); }
 
-    public function set_template($template)
+    public function setTemplate($template)
     {
         $this->template = $template;
     }
