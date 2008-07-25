@@ -126,7 +126,7 @@ class WikiPage
                 $entry->blob = $commit->repo->getObject($commit->find($this->path));
                 $blobname = $entry->blob->getName();
             }
-            catch (InvalidPageError $e)
+            catch (GitTreeNotFoundError $e)
             {
                 $entry->blob = NULL;
                 $blobname = NULL;
