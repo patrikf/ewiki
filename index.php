@@ -178,7 +178,7 @@ else if ($action == 'history') // {{{1
 }
 else if ($action == 'edit') // {{{1
 {
-    if (isset($_POST['content'])) // {{{2
+    if (isset($_POST['content']) && Config::ALLOW_EDIT) // {{{2
     {
         if ($_POST['type'] == 'file')
             $content = file_get_contents($_FILES['file']['tmp_name']);

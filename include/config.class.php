@@ -17,6 +17,9 @@ final class Config
     // The branch that should be used
     const GIT_BRANCH = 'master';
 
+    // Allow editing via web interface
+    const ALLOW_EDIT = true;
+
     // The locale used by the wiki
     const LOCALE = 'en_US.UTF-8';
 
