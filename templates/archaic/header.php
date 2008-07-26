@@ -4,8 +4,8 @@
 <head>
 <title><?= Config::WIKI_NAME ?>: <?= Markup::escape($title) ?></title>
 <link rel="stylesheet" href="<?= Config::PATH . '/templates/' . Config::TEMPLATE . '/style.css' ?>" />
-<script src="<?= Config::PATH ?>/mootools-1.2-core-nc.js" type="text/javascript"></script>
-<script src="<?= Config::PATH ?>/templates/<?= Config::TEMPLATE ?>/site.js" type="text/javascript"></script>
+<script type="text/javascript" src="<?= Config::PATH ?>/mootools-1.2-core-nc.js"></script>
+<script type="text/javascript" src="<?= Config::PATH ?>/templates/<?= Config::TEMPLATE ?>/site.js"></script>
 </head>
 <body>
 <div id="page">
