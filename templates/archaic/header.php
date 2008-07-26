@@ -16,9 +16,13 @@
     </div>
     <? if (isset($page)): ?>
         <div id="pagelinks">
-           <a href="<?= $page->getURL() ?>"<?= $action == 'view' ? ' class="active"' : '' ?>>view</a>
-           <a href="<?= $page->getURL() ?>?action=edit"<?= $action == 'edit' ? ' class="active"' : '' ?>><?= Config::ALLOW_EDIT ? 'edit' : 'source' ?></a>
-           <a href="<?= $page->getURL() ?>?action=history"<?= $action == 'history' ? ' class="active"' : '' ?>>history</a>
+        <? foreach (array('view' => 'view', 'edit' => (Config::ALLOW_EDIT ? 'edit' : 'source'), 'history' => 'history') as $i => $label): ?>
+            <a
+                href="<?= $page->getURL() ?><?= $i == 'view' ? '' : '?action='.$i ?>"
+                <?= $i == $action ? ' class="active"' : '' ?>>
+                <?= $label ?>
+            </a>
+        <? endforeach; ?>
         </div>
     <? endif; ?>
     <div style="clear: both"></div>
