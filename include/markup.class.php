@@ -45,9 +45,7 @@ class Markup
             }
             else if ($context == 'cell' && (substr($in, 0, 1) == '|' || substr($in, 0, 1) == "\n"))
                 return;
-            else if($context == 'list' && substr($in, 0, 1) == "\n" && substr(ltrim(substr($in, 1)), 0, 1) != '*')
-                return;
-            else if($context == 'list-element' && (substr($in, 0, 1) == '*' || substr($in, 0, 1) == "\n"))
+            else if ($context == 'list_element' && $newlines)
                 return;
             else if (substr($in, 0, 1) == "\n")
             {
@@ -125,17 +123,16 @@ class Markup
                 else
                     return;
             }
-            else if($context == 'list')
+            else if ($context == 'list')
             {
-                if(substr($in, 0, 1) == '*')
+                while (substr($in, 0, 1) == '*')
                 {
                     $in = substr($in, 1);
                     $out .= '<li>';
-                    Markup::parse($in, $out, 'list-element');
+                    Markup::parse($in, $out, 'list_element');
                     $out .= '</li>';
                 }
-                else
-                    return;
+                return;
             }
             else if ($context == 'strong' && substr($in, 0, 3) == "'''")
             {
