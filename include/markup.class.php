@@ -27,7 +27,7 @@ class Markup
         return ($raw ? $in : htmlspecialchars($in, ENT_NOQUOTES, 'UTF-8'));
     }
 
-    private static function parse(&$in, &$out, $context)
+    private static function parse(&$in, &$out, $context = null)
     {
         $raw = ($context == 'link_target');
         $newlines = 0;
@@ -44,6 +44,10 @@ class Markup
                 $in = substr($in, 2);
             }
             else if ($context == 'cell' && (substr($in, 0, 1) == '|' || substr($in, 0, 1) == "\n"))
+                return;
+            else if($context == 'list' && substr($in, 0, 1) == "\n" && substr(ltrim(substr($in, 1)), 0, 1) != '*')
+                return;
+            else if($context == 'list-element' && (substr($in, 0, 1) == '*' || substr($in, 0, 1) == "\n"))
                 return;
             else if (substr($in, 0, 1) == "\n")
             {
@@ -64,6 +68,12 @@ class Markup
                 $out .= '<table>';
                 Markup::parse($in, $out, 'table');
                 $out .= '</table>';
+            }
+            else if ($context == NULL && substr($in, 0, 1) == '*')
+            {
+                $out .= '<ul>';
+                Markup::parse($in, $out, 'list');
+                $out .= '</ul>';
             }
             else if ($context == NULL)
             {
@@ -115,6 +125,18 @@ class Markup
                 else
                     return;
             }
+            else if($context == 'list')
+            {
+                if(substr($in, 0, 1) == '*')
+                {
+                    $in = substr($in, 1);
+                    $out .= '<li>';
+                    Markup::parse($in, $out, 'list-element');
+                    $out .= '</li>';
+                }
+                else
+                    return;
+            }
             else if ($context == 'strong' && substr($in, 0, 3) == "'''")
             {
                 $in = substr($in, 3);
@@ -146,7 +168,7 @@ class Markup
             }
             else
             {
-                $pos = strcspn($in, "~#[|]'\\\n", 1)+1;
+                $pos = strcspn($in, "~#[|]*'\\\n", 1)+1;
                 if ($pos === FALSE)
                 {
                     $out .= $in;
