@@ -2,6 +2,8 @@
 
 error_reporting(E_ALL | E_STRICT);
 
+ini_set('short_open_tag', '1');
+
 set_include_path('include/');
 require_once('core.class.php');
 require_once('config.class.php');

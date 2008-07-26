@@ -1,5 +1,5 @@
-<?php $title = $page->getName(); ?>
-<?php include('header.php'); ?>
+<? $title = $page->getName(); ?>
+<? include('header.php'); ?>
 <h1 id="pagetitle" class="new"><?= Markup::escape($page->getName()) ?></h1>
 <p>
 <? if ($has_history): ?>
@@ -11,4 +11,4 @@ This page does not exist yet.
 You can <a href="<?= $page->getURL() ?>?action=edit" class="new">create it now</a>.
 <? endif; ?>
 </p>
-<?php include('footer.php');
+<? include('footer.php');

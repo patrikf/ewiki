@@ -1,5 +1,5 @@
-<?php $title = 'Recent changes'; ?>
-<?php include('header.php'); ?>
+<? $title = 'Recent changes'; ?>
+<? include('header.php'); ?>
 <h1 id="pagetitle">Recent changes</h1>
 <div class="commits">
 <? foreach ($commits as $commit): ?>
@@ -10,12 +10,12 @@
         <? endif; ?>
         <? if ($commit->changes): ?>
             <div class="changes">
-            <?php foreach ($commit->changes as $change): ?>
+            <? foreach ($commit->changes as $change): ?>
                 <div class="change"><?= $change->type ?> <a href="<?= $change->subject_url ?>"><?= $change->subject ?></a></div>
-            <?php endforeach; ?>
+            <? endforeach; ?>
             </div>
         <? endif; ?>
     </div>
 <? endforeach; ?>
 </div>
-<?php include('footer.php');
+<? include('footer.php');
