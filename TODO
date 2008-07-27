@@ -1,0 +1,11 @@
+* server-side caching?
+* client-side caching?
+* support for diffs
+* authentication
+* revamped markup
+* support for inline images?
+* support for viewing commit details, author details
+
+* proper support for merge commits in history?
+The current approach simply sorts commits by time to achieve a somewhat
+sensible linear history.
