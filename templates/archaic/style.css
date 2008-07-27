@@ -121,7 +121,8 @@ table.history
     font-size: .8em;
 }
 
-#edit-form textarea
+#edit-form textarea,
+.view-source textarea
 {
     font-family: monospace;
     font-size: .9em;
