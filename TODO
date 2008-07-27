@@ -1,7 +1,20 @@
+== important
+* conflict resolution
+Allow the user to resolve conflicts when a fast-forward merge of an edited
+page fails. The code should first check whether the file being edited has
+actually been modified in the meantime, and if so, present the user with two
+text areas (his just-submitted version, and the current tip of the branch) to
+allow interactive merges.
+
+Ideally, for each conflict, a topic branch is created to ensure no work is
+lost. Maybe there could also be a "pending merges" page.
+
+* authentication
+
+== less important
 * server-side caching?
 * client-side caching?
 * support for diffs
-* authentication
 * revamped markup
 * support for inline images?
 * support for viewing commit details, author details
