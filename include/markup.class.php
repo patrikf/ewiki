@@ -7,18 +7,18 @@ class Markup
         $ref = strtr($ref, "\n", ' ');
         $parts = explode(':', $ref, 2);
         $valid = -1;
-        if ($parts[0] == 'wp')
-        {
-            $url = 'http://en.wikipedia.org/wiki/'.strtr(implode('/', array_map('urlencode', explode('/', $parts[1]))), '+', '_');
-        }
-        else if ($parts[0] == 'http')
-            $url = $ref;
-        else
+        if (count($parts) == 1)
         {
             $page = new WikiPage(explode('/', $ref));
             $valid = ($page->object !== NULL);
             $url = $page->getURL();
         }
+        else if ($parts[0] == 'wp')
+        {
+            $url = 'http://en.wikipedia.org/wiki/'.strtr(implode('/', array_map('urlencode', explode('/', $parts[1]))), '+', '_');
+        }
+        else
+            $url = $ref;
         return array($url, $ref, $valid);
     }
 
