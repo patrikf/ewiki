@@ -60,6 +60,19 @@ div.par
     line-height: 1.5;
 }
 
+ul
+{
+    margin: .75em 0px;
+    padding-left: 1em;
+    line-height: 1.2;
+    list-style: outside square;
+}
+
+ul li
+{
+    margin: .2em 0px;
+}
+
 a
 {
     color: #02A;
