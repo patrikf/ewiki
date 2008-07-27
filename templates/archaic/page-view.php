@@ -1,5 +1,17 @@
 <? $title = $page->getName(); ?>
-<? include('header.php'); ?>
+<? require('header.php'); ?>
 <h1 id="pagetitle"><?= Markup::escape($page->getName()) ?></h1>
-<?= $page->format() ?>
-<? include('footer.php');
+<?php
+
+$map = array(
+        WikiPage::TYPE_PAGE => 'text',
+        WikiPage::TYPE_BINARY => 'binary',
+        WikiPage::TYPE_IMAGE => 'image',
+        WikiPage::TYPE_TREE => 'tree',
+        NULL => 'new'
+    );
+
+require('page-view-'.$map[$type].'.php');
+
+?>
+<? require('footer.php'); ?>

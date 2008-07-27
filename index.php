@@ -31,14 +31,17 @@ $parts[0] = substr($parts[0], strlen(Config::PATH));
 
 $view = new View;
 
-$is_head = !isset($_GET['commit']);
-if ($is_head)
-    $commit = $repo->getHead(Config::GIT_BRANCH);
-else
+$tip = $repo->getHead(Config::GIT_BRANCH);
+$commit = $tip;
+if (isset($_GET['commit']))
     $commit = sha1_bin($_GET['commit']);
 $commit = $repo->getObject($commit);
 $commit_id = sha1_hex($commit->getName());
 $view->commit_id = $commit_id;
+
+$link_to_tip = !isset($_GET['commit']);
+$commit_is_tip = ($commit->getName() == $tip);
+$view->commit_is_tip = $commit_is_tip;
 
 $special = $page = NULL;
 if (!strncmp($parts[0], '/:', 2))
@@ -129,33 +132,25 @@ else if ($special !== NULL) // {{{1
     throw new Exception(sprintf('unknown special: %s', $special));
 else if ($action == 'view') // {{{1
 {
-    switch ($page->getPageType())
-    {
-        case WikiPage::TYPE_PAGE:
-            $view->setTemplate('page-view.php');
-            break;
-        case WikiPage::TYPE_IMAGE:
-            $view->setTemplate('page-view-image.php');
-            break;
-        case WikiPage::TYPE_BINARY:
-            $view->setTemplate('page-view-binary.php');
-            break;
-        case WikiPage::TYPE_TREE:
-            $view->setTemplate('page-view-tree.php');
+    $view->setTemplate('page-view.php');
 
-            $view->entries = array();
-            foreach ($page->listEntries() as $entry)
-            {
-                $obj = new stdClass;
-                $obj->url = $entry->getURL() . ($is_head ? '' : '?commit='.$commit_id);
-                $obj->name = $entry->getName();
-                array_push($view->entries, $obj);
-            }
-            break;
-        case NULL:
-            $view->setTemplate('page-new.php');
-            $view->has_history = !!count($page->getPageHistory());
-            break;
+    $type = $page->getPageType();
+    $view->type = $type;
+
+    if ($type == WikiPage::TYPE_TREE)
+    {
+        $view->entries = array();
+        foreach ($page->listEntries() as $entry)
+        {
+            $obj = new stdClass;
+            $obj->url = $entry->getURL() . ($link_to_tip ? '' : '?commit='.$commit_id);
+            $obj->name = $entry->getName();
+            array_push($view->entries, $obj);
+        }
+    }
+    else if ($type == NULL)
+    {
+        $view->has_history = !!count($page->getPageHistory());
     }
     $view->display();
 }
