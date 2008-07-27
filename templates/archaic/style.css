@@ -156,8 +156,9 @@ table.history
 .sha1
 {
     font-family: monospace;
-    font-size: .7em;
-    color: #AAA;
+    font-size: .8em;
+    position: relative;
+    top: -.1em;
 }
 
 div.commits .commit
@@ -174,6 +175,16 @@ div.commits .commit .summary
 div.commits .commit .changes
 {
     font-family: monospace;
+    font-size: .8em;
+}
+
+div.history-warning
+{
+    background-color: #FFE;
+    border: 1px solid #FA0;
+    padding: .5em 1em;
+    margin: 1em 0px;
+    line-height: 1.2;
     font-size: .8em;
 }
 
