@@ -189,41 +189,12 @@ else if ($action == 'edit') // {{{1
 	$blob->data = $content;
 	$blob->rehash();
 
-	$tree = clone $repo->getObject($commit->tree);
-	$cur = NULL;
-	$obj = $tree;
-	/* pending_refs: allows us to reference objects that we modify in the
-	 *               future (dirty solution) */
-	$pending_refs = array();
-	foreach ($page->path as $part)
-	{
-	    array_push($pending, $obj);
-	    if (!isset($obj->nodes[$part]))
-	    {
-		$cur = $obj->nodes[$part] = new stdClass;
-		$cur->mode = 040000;
-		$cur->name = $part;
-		$obj = new GitTree($repo);
-	    }
-	    else
-	    {
-		$cur = $obj->nodes[$part];
-		$obj = clone $repo->getObject($cur->object);
-	    }
-	    array_unshift($pending_refs, array($cur, $obj));
-	}
-	array_shift($pending_refs); /* we're overwriting this saved tree */
-	$cur->mode = 0100640;
-	$cur->object = $blob->getName();
-	foreach ($pending_refs as $ref)
-	{
-	    $ref[1]->rehash();
-	    $ref[0]->object = $ref[1]->getName();
-	}
-	$tree->rehash();
+        $tree = clone $repo->getObject($commit->tree);
+        $pending = array_merge($pending, $tree->updateNode($page->path, 0100640, $blob->getName()));
+        $tree->rehash();
+        array_push($pending, $tree);
 
 	$newcommit = new GitCommit($repo);
-	array_push($pending, $newcommit);
 	$newcommit->tree = $tree->getName();
 	$newcommit->parents = array($commit->getName());
 	$stamp = new GitCommitStamp;
@@ -238,6 +209,7 @@ else if ($action == 'edit') // {{{1
 	$newcommit->summary = sprintf('%s: %s', $page->getName(), $_POST['summary']);
 	$newcommit->detail = '';
 	$newcommit->rehash();
+	array_push($pending, $newcommit);
 
 	/* now, try to automatically fast-forward configured branch */
 	$f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_BRANCH), 'a+');
