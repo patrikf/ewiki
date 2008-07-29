@@ -189,6 +189,45 @@ else if ($action == 'edit') // {{{1
 	$blob->data = $content;
 	$blob->rehash();
 
+	$f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_BRANCH), 'a+b');
+	flock($f, LOCK_EX);
+	$ref = stream_get_contents($f);
+
+        $fast_forward = FALSE;
+        $fast_merge = FALSE;
+        $commit_base = $commit;
+        if (strlen($ref) == 0)
+        {
+            /* create branch from scratch */
+            $fast_forward = TRUE;
+        }
+        else
+        {
+            $ref = sha1_bin($ref);
+            if ($ref == $commit->getName())
+            {
+                /* no new commits */
+                $fast_forward = TRUE;
+            }
+            else
+            {
+                $tip = $repo->getObject($ref);
+                try
+                {
+                    if ($tip->find($page->path) == $commit->find($page->path))
+                    {
+                        /*
+                         * New commits have been made, but the concerned file
+                         * has the same contents as when we started editing. We
+                         * directly perform the trivial merge.
+                         */
+                        $fast_merge = TRUE;
+                    }
+                }
+                catch (GitTreeError $e) {}
+            }
+        }
+
         $tree = clone $repo->getObject($commit->tree);
         $pending = array_merge($pending, $tree->updateNode($page->path, 0100640, $blob->getName()));
         $tree->rehash();
@@ -196,7 +235,7 @@ else if ($action == 'edit') // {{{1
 
 	$newcommit = new GitCommit($repo);
 	$newcommit->tree = $tree->getName();
-	$newcommit->parents = array($commit->getName());
+        $newcommit->parents = array($commit->getName());
 	$stamp = new GitCommitStamp;
 	$stamp->name = $_SERVER['REMOTE_ADDR'];
 	$stamp->email = sprintf('anonymous@%s', $_SERVER['REMOTE_ADDR']);
@@ -211,23 +250,70 @@ else if ($action == 'edit') // {{{1
 	$newcommit->rehash();
 	array_push($pending, $newcommit);
 
-	/* now, try to automatically fast-forward configured branch */
-	$f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_BRANCH), 'a+b');
-	flock($f, LOCK_EX);
-	$ref = stream_get_contents($f);
-	if (strlen($ref) == 0 || sha1_bin($ref) == $commit->getName())
-	{
-	    foreach ($pending as $obj)
-		$obj->write();
-	    ftruncate($f, 0);
-	    fwrite($f, sha1_hex($newcommit->getName()));
+        if ($fast_merge)
+        {
+            /* create merge commit */
+
+            $tree = clone $repo->getObject($tip->tree);
+            $pending = array_merge($pending, $tree->updateNode($page->path, 0100640, $blob->getName()));
+            $tree->rehash();
+            array_push($pending, $tree);
+
+            $merge_base = $newcommit;
+
+            $newcommit = new GitCommit($repo);
+            $newcommit->tree = $tree->getName();
+            $newcommit->parents = array($tip->getName(), $merge_base->getName());
+            $newcommit->author = $stamp;
+            $newcommit->committer = $stamp;
+            $newcommit->summary = 'Fast merge';
+            $newcommit->detail = '';
+            $newcommit->rehash();
+            array_push($pending, $newcommit);
+        }
+
+	if (!$fast_forward && !$fast_merge)
+        {
+            fclose($f);
+
+            /* create conflict branch */
+
+            $dir = sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_CONFLICT_BRANCH_DIR);
+            if (!file_exists($dir))
+                mkdir($dir, 0755);
+            if (!is_dir($dir))
+                throw new Exception(sprintf('%s is not a directory', $dir));
+            if (!is_writable($dir))
+                throw new Exception(sprintf('cannot write to %s', $dir));
+
+            $f = FALSE;
+            for ($i = 1; !$f; $i++)
+            {
+                $branch = sprintf('%s/%02d', Config::GIT_CONFLICT_BRANCH_DIR, $i);
+                try
+                {
+                    $f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, $branch), 'xb');
+                }
+                catch (Exception $e)
+                {
+                    /*
+                     * fopen() will raise a warning if the file already
+                     * exists, which Core will make into an Exception.
+                     */
+                }
+            }
+            flock($f, LOCK_EX);
 	}
-	else
-	{
-	    throw new Exception('fast-forward merge not possible');
-	}
-	fclose($f);
-        redirect($page->getURL());
+        foreach ($pending as $obj)
+            $obj->write();
+        ftruncate($f, 0);
+        fwrite($f, sha1_hex($newcommit->getName()));
+        fclose($f);
+
+        if ($fast_forward || $fast_merge)
+            redirect($page->getURL());
+        else
+            redirect(sprintf('%s/:merge/%s?fresh', Config::PATH, join('/', array_map('urlencode', explode('/', $branch)))));
     }
     else // {{{2
     {

@@ -5,7 +5,7 @@ final class Config
     // The name of the wiki
     const WIKI_NAME = 'eWiki';
 
-    // The absolute path of the wiki (no trailing slash)
+    // The path of the wiki relative to the web root (no trailing slash)
     const PATH = '';
 
     // The template for the wiki (see templates/)
@@ -17,7 +17,13 @@ final class Config
     // The branch that should be used
     const GIT_BRANCH = 'master';
 
-    // Allow editing via web interface
+    /*
+     * The sub-dir that conflict branches shall be created within.
+     * e.g. 'conflict': conflict/01, conflict/02, ...
+     */
+    const GIT_CONFLICT_BRANCH_DIR = 'conflict';
+
+    // Allow editing via web interface?
     const ALLOW_EDIT = true;
 
     // The locale used by the wiki
