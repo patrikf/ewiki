@@ -212,7 +212,7 @@ else if ($action == 'edit') // {{{1
 	array_push($pending, $newcommit);
 
 	/* now, try to automatically fast-forward configured branch */
-	$f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_BRANCH), 'a+');
+	$f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_BRANCH), 'a+b');
 	flock($f, LOCK_EX);
 	$ref = stream_get_contents($f);
 	if (strlen($ref) == 0 || sha1_bin($ref) == $commit->getName())
