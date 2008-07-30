@@ -48,13 +48,38 @@ function ls_r($path)
     return $r;
 }
 
+function gentoken($len, $chrs='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./-_')
+{
+    $str = '';
+    for ($i = 0; $i < $len; $i++)
+        $str .= $chrs{rand(0, strlen($chrs)-1)};
+    return $str;
+}
+
+$pdo = new PDO(Config::DSN);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$view = new View;
+
+$user = NULL;
+if (isset($_COOKIE['session']))
+{
+    $stmt = $pdo->prepare('SELECT * FROM ewiki_users WHERE "session" = :session');
+    $stmt->execute(array('session' => $_COOKIE['session']));
+    $user = $stmt->fetchObject();
+    $stmt->closeCursor();
+
+    if ($user === FALSE)
+        $user = NULL;
+}
+
+$view->user = $user;
+
 $repo = new Git(Config::GIT_PATH);
 
 $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
 assert(!strncmp($parts[0], Config::PATH, strlen(Config::PATH)));
 $parts[0] = substr($parts[0], strlen(Config::PATH));
-
-$view = new View;
 
 $tip = $repo->getHead(Config::GIT_BRANCH);
 $commit = $tip;
@@ -84,7 +109,36 @@ else
     $view->page = $page;
 }
 
-if ($special[0] == 'recent') // {{{1
+if (!$user || $special[0] == 'login') // {{{1
+{
+    $view->setTemplate('login.php');
+
+    $view->wrong = FALSE;
+    if (isset($_POST['user']) && isset($_POST['password']))
+    {
+        $stmt = $pdo->prepare('SELECT * FROM ewiki_users WHERE "user" = :user AND "password" = :password');
+        $stmt->execute(array('user' => $_POST['user'], 'password' => sha1($_POST['password'])));
+        $user = $stmt->fetchObject();
+        $stmt->closeCursor();
+
+        if ($user)
+        {
+            $session = gentoken(10);
+            $stmt = $pdo->prepare('UPDATE ewiki_users SET "session" = :session WHERE "user" = :user');
+            $stmt->execute(array('user' => $user->user, 'session' => $session));
+            $stmt->closeCursor();
+
+            setcookie('session', $session, 0, Config::PATH . '/');
+            redirect(Config::PATH . '/');
+            exit(0);
+        }
+        else
+            $view->wrong = TRUE;
+    }
+
+    $view->display();
+}
+else if ($special[0] == 'recent') // {{{1
 {
     $view->setTemplate('recent-changes.php');
 
@@ -192,6 +246,47 @@ else if ($special[0] == 'merge') // {{{1
     $view->fresh = isset($_GET['fresh']);
 
     $view->display();
+}
+else if ($special[0] == 'profile') // {{{1
+{
+    $view->setTemplate('edit-profile.php');
+
+    $view->invalid_password = FALSE;
+    if (isset($_POST['email']) && isset($_POST['newpass']))
+    {
+        $stmt = $pdo->prepare('UPDATE ewiki_users SET "email" = :email WHERE "user" = :user');
+        $stmt->execute(array('user' => $user->user, 'email' => $_POST['email']));
+        $stmt->closeCursor();
+        $user->email = $_POST['email'];
+
+        if ($_POST['newpass'])
+        {
+            if (strlen($_POST['newpass']) >= 3)
+            {
+                $stmt = $pdo->prepare('UPDATE ewiki_users SET "password" = :pass WHERE "user" = :user');
+                $stmt->execute(array('user' => $user->user, 'pass' => sha1($_POST['newpass'])));
+                $stmt->closeCursor();
+            }
+            else
+                $view->invalid_password = TRUE;
+        }
+
+        if (!$view->invalid_password)
+        {
+            redirect(Config::PATH . '/');
+            exit(0);
+        }
+    }
+
+    $view->display();
+}
+else if ($special[0] == 'logout') // {{{1
+{
+    $stmt = $pdo->prepare('UPDATE ewiki_users SET "session" = NULL WHERE "user" = :user');
+    $stmt->execute(array('user' => $user->user));
+    $stmt->closeCursor();
+    setcookie('session', '', 1, Config::PATH . '/');
+    redirect(Config::PATH . '/');
 }
 else if ($special !== NULL) // {{{1
     throw new Exception(sprintf('unknown special: %s', $special[0]));
@@ -302,8 +397,16 @@ else if ($action == 'edit') // {{{1
 	$newcommit->tree = $tree->getName();
         $newcommit->parents = array($commit->getName());
 	$stamp = new GitCommitStamp;
-	$stamp->name = $_SERVER['REMOTE_ADDR'];
-	$stamp->email = sprintf('anonymous@%s', $_SERVER['REMOTE_ADDR']);
+        if ($user)
+        {
+            $stamp->name = $user->name;
+            $stamp->email = $user->email;
+        }
+        else
+        {
+            $stamp->name = $_SERVER['REMOTE_ADDR'];
+            $stamp->email = sprintf('anonymous@%s', $_SERVER['REMOTE_ADDR']);
+        }
 	$stamp->time = time();
 	$stamp->offset = idate('Z', $stamp->time);
 

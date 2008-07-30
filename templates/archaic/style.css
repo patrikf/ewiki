@@ -30,7 +30,7 @@ body
 #linkpane
 {
     font-size: .75em;
-    line-height: 1.2;
+    line-height: 1.5;
     padding-top: 1em;
 }
 
@@ -43,7 +43,9 @@ body
     float: left;
     text-align: left;
 }
-#globallinks a { margin: 0px 1em 0px 0px; }
+#globallinks a,
+#userinfo a,
+#userinfo #uid { margin: 0px 1em 0px 0px; }
 
 #pagelinks
 {
@@ -52,6 +54,12 @@ body
     text-align: right;
 }
 #pagelinks a { margin: 0px 0px 0px 1em; }
+
+#userinfo,
+#userinfo a
+{
+    color: #AAA;
+}
 
 p,
 div.par
@@ -133,7 +141,7 @@ table.history
     overflow: scroll;
 }
 
-#edit-form input.summary
+input.text
 {
     font-family: monospace;
     font-size: .9em;
@@ -142,7 +150,7 @@ table.history
     padding: .25em;
 }
 
-#edit-form input.submit
+input.submit
 {
     display: block;
     margin: .75em 0px .75em auto;
@@ -178,13 +186,24 @@ div.commits .commit .changes
     font-size: .8em;
 }
 
+div.error,
 div.history-warning
 {
-    background-color: #FFE;
-    border: 1px solid #FA0;
     padding: .5em 1em;
     margin: 1em 0px;
     line-height: 1.2;
     font-size: .8em;
+}
+
+div.history-warning
+{
+    background-color: #FFE;
+    border: 1px solid #FA0;
+}
+
+div.error
+{
+    background-color: #FEE;
+    border: 1px solid #F00;
 }
 

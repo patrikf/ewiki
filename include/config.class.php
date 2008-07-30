@@ -37,5 +37,8 @@ final class Config
 
     // The default maximum image height
     const IMAGE_HEIGHT = 480;
+
+    // The DSN of the database to use
+    const DSN = 'pgsql:';
 }
 

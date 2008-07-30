@@ -10,6 +10,13 @@
 <body>
 <div id="page">
 <div id="linkpane">
+    <? if ($user): ?>
+    <div id="userinfo">
+        <span id="uid"><?= Markup::escape($user->name) ?>
+        &lt;<?= Markup::escape($user->email) ?>&gt;</span>
+        <a href="<?= Config::PATH ?>/:profile">change password/email</a>
+        <a href="<?= Config::PATH ?>/:logout">logout</a>
+    </div>
     <div id="globallinks">
         <a href="<?= Config::PATH ?>/">home</a>
         <a href="<?= Config::PATH ?>/:recent">recent changes</a>
@@ -27,4 +34,5 @@
         </div>
     <? endif; ?>
     <div style="clear: both"></div>
+    <? endif; ?>
 </div>

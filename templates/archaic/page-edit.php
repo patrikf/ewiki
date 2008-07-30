@@ -36,7 +36,7 @@
 
 <div class="par">
     Summary of changes:
-    <input type="text" name="summary" class="summary" />
+    <input type="text" name="summary" class="text" />
     <div class="submit">
         <input type="submit" value="Save changes" class="submit" />
     </div>
