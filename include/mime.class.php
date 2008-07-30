@@ -180,7 +180,6 @@ class MIME
         $pos = $this->uint32_at(24);
         list($n, $max_extent, $pos) = $this->nuint32_at($pos, 3);
 
-        $r = array();
         for ($i = 0; $i < $n; $i++, $pos += 16)
         {
             list($pri, $type_off, $n_matchlets, $matchlets_off) = $this->nuint32_at($pos, 4);
@@ -191,9 +190,8 @@ class MIME
                 continue;
 
             if ($this->bufMatchlets($buf, $matchlets_off, $n_matchlets))
-                array_push($r, array($pri, $this->string_at($type_off)));
+                return $this->string_at($type_off);
         }
-        return $r;
     }
 
     protected function bufGuessBinary(&$buf)
@@ -215,8 +213,8 @@ class MIME
         if ($filename)
         {
             $r = $this->bufMagic($buf, 80);
-            if (count($r))
-                return $r[0][1];
+            if ($r)
+                return $r;
 
             $r = $this->literal($filename);
             if ($r)
@@ -236,8 +234,8 @@ class MIME
             if ($is_binary)
             {
                 $r = $this->bufMagic($buf, 0, 79);
-                if (count($r))
-                    return $r[0][1];
+                if ($r)
+                    return $r;
             }
         }
         else
@@ -247,8 +245,8 @@ class MIME
                 $r = $this->bufMagic($buf);
             else
                 $r = $this->bufMagic($buf, 80);
-            if (count($r))
-                return $r[0][1];
+            if ($r)
+                return $r;
         }
         return $is_binary ? 'application/octet-stream' : 'text/plain';
     }
