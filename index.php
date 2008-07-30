@@ -70,7 +70,7 @@ $view->n_conflicts = count(ls_r(sprintf('%s/refs/heads/%s', Config::GIT_PATH, Co
 
 $special = $page = NULL;
 if (!strncmp($parts[0], '/:', 2))
-    $special = substr($parts[0], 2);
+    $special = explode('/', substr($parts[0], 2), 2);
 else
 {
     $action = isset($_GET['action']) ? $_GET['action'] : '';
@@ -82,7 +82,7 @@ else
     $view->page = $page;
 }
 
-if ($special == 'recent') // {{{1
+if ($special[0] == 'recent') // {{{1
 {
     $view->setTemplate('recent-changes.php');
 
@@ -128,7 +128,7 @@ if ($special == 'recent') // {{{1
 
     $view->display();
 }
-else if ($special == 'conflicts') // {{{1
+else if ($special[0] == 'conflicts') // {{{1
 {
     $view->setTemplate('conflicts.php');
 
@@ -146,8 +146,53 @@ else if ($special == 'conflicts') // {{{1
 
     $view->display();
 }
+else if ($special[0] == 'merge') // {{{1
+{
+    $view->setTemplate('merge.php');
+
+    $A = new stdClass;
+    $A->branch = Config::GIT_BRANCH;
+
+    $B = new stdClass;
+    $B->branch = $special[1];
+
+    foreach (array($A, $B) as $I)
+    {
+        $I->tip = $repo->getObject($repo->getHead($I->branch));
+        $I->commit_id = sha1_hex($I->tip->getName());
+    }
+
+    if (count($B->tip->parents) == 0)
+        $parent = NULL;
+    else if (count($B->tip->parents) == 1)
+        $parent = $repo->getObject($B->tip->parents[0]);
+    else
+        throw new Exception('Not implemented: trying to merge a merge commit');
+
+    $changes = GitCommit::treeDiff($parent, $B->tip);
+    if (count($changes) == 0)
+        throw new Exception('Not implemented: commit to be merged did not introduce any changes?!');
+    else if (count($changes) != 1)
+        throw new Exception('Not implemented: more than one file changed');
+
+    list($path, $type) = each($changes);
+    $view->page_name = $path;
+
+    foreach (array($A, $B) as $I)
+    {
+        $I->page = new WikiPage($path, $I->tip);
+        if ($I->page->getPageType() != WikiPage::TYPE_PAGE)
+            throw new Exception('Not implemented: merging binary files, adding/removing files');
+    }
+
+    $view->A = $A;
+    $view->B = $B;
+    $view->fresh = isset($_GET['fresh']);
+
+    $view->display();
+}
 else if ($special !== NULL) // {{{1
-    throw new Exception(sprintf('unknown special: %s', $special));
+    throw new Exception(sprintf('unknown special: %s', $special[0]));
 else if ($action == 'view') // {{{1
 {
     $view->setTemplate('page-view.php');

@@ -51,6 +51,11 @@ class WikiPage
         return implode('/', $this->path).($this->object instanceof GitTree ? '/' : '');
     }
 
+    public function link()
+    {
+        return sprintf('<a href="%s">%s</a>', $this->getURL(), Markup::escape($this->getName()));
+    }
+
     public function format()
     {
         return Markup::format($this->object->data);

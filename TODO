@@ -9,6 +9,8 @@ allow interactive merges.
 Ideally, for each conflict, a topic branch is created to ensure no work is
 lost. Maybe there could also be a "pending merges" page.
 
+* show unmerged conflicts on the page itself
+
 * authentication
 
 == less important
