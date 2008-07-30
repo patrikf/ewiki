@@ -13,6 +13,7 @@
     <div id="globallinks">
         <a href="<?= Config::PATH ?>/">home</a>
         <a href="<?= Config::PATH ?>/:recent">recent changes</a>
+        <a href="<?= Config::PATH ?>/:conflicts">unmerged conflicts (<?= $n_conflicts ?>)</a>
     </div>
     <? if (isset($page)): ?>
         <div id="pagelinks">

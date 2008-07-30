@@ -23,6 +23,29 @@ function redirect($uri)
     header('Location: '.$uri);
 }
 
+function ls_r($path)
+{
+    $dirs = array('');
+    $r = array();
+
+    while (($dir = array_shift($dirs)) !== NULL)
+    {
+        $d = opendir($path.'/'.$dir);
+        while (($entry = readdir($d)) !== FALSE)
+        {
+            if ($entry == '.' || $entry == '..')
+                continue;
+            $entry = $dir.$entry;
+            if (is_dir($path.'/'.$entry))
+                array_push($dirs, $entry.'/');
+            else
+                array_push($r, $entry);
+        }
+        closedir($d);
+    }
+    return $r;
+}
+
 $repo = new Git(Config::GIT_PATH);
 
 $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
@@ -42,6 +65,8 @@ $view->commit_id = $commit_id;
 $link_to_tip = !isset($_GET['commit']);
 $commit_is_tip = ($commit->getName() == $tip);
 $view->commit_is_tip = $commit_is_tip;
+
+$view->n_conflicts = count(ls_r(sprintf('%s/refs/heads/%s', Config::GIT_PATH, Config::GIT_CONFLICT_BRANCH_DIR)));
 
 $special = $page = NULL;
 if (!strncmp($parts[0], '/:', 2))
@@ -125,6 +150,24 @@ if ($special == 'recent') // {{{1
         $commits[$i]->changes = $changes;
     }
     $view->commits = $commits;
+
+    $view->display();
+}
+else if ($special == 'conflicts') // {{{1
+{
+    $view->setTemplate('conflicts.php');
+
+    $conflicts = ls_r(sprintf('%s/refs/heads/%s', Config::GIT_PATH, Config::GIT_CONFLICT_BRANCH_DIR));
+    sort($conflicts);
+    $view->conflicts = array();
+    foreach ($conflicts as $name)
+    {
+        $obj = new stdClass;
+        $obj->branch = sprintf('%s/%s', Config::GIT_CONFLICT_BRANCH_DIR, $name);
+        $obj->merge_url = sprintf('%s/:merge/%s', Config::PATH, join('/', array_map('urlencode', explode('/', $obj->branch))));
+
+        array_push($view->conflicts, $obj);
+    }
 
     $view->display();
 }
