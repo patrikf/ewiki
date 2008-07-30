@@ -102,45 +102,20 @@ if ($special == 'recent') // {{{1
         else
             $prev = NULL;
 
-        $prev_files = $prev ? $prev->repo->getObject($prev->tree)->listRecursive() : array();
-        $cur_files = $cur->repo->getObject($cur->tree)->listRecursive();
         $changes = array();
-
-        sort($prev_files);
-        sort($cur_files);
-        $a = $b = 0;
-        while ($a < count($prev_files) || $b < count($cur_files))
+        foreach (GitCommit::treeDiff($prev, $cur) as $subject => $type)
         {
-            if ($a < count($prev_files) && $b < count($cur_files))
-                $cmp = strcmp($prev_files[$a], $cur_files[$b]);
-            else
-                $cmp = 0;
             $change = new stdClass;
-            if ($b >= count($cur_files) || $cmp < 0)
-            {
+            $change->subject = $subject;
+
+            if ($type == GitTree::TREEDIFF_REMOVED)
                 $change->type = 'removed';
-                $change->subject = $prev_files[$a];
-                array_push($changes, $change);
-                $a++;
-            }
-            else if ($a >= count($prev_files) || $cmp > 0)
-            {
+            else if ($type == GitTree::TREEDIFF_CHANGED)
+                $change->type = 'modified';
+            else if ($type == GitTree::TREEDIFF_ADDED)
                 $change->type = 'added';
-                $change->subject = $cur_files[$b];
-                array_push($changes, $change);
-                $b++;
-            }
-            else
-            {
-                if ($prev->find($prev_files[$a]) != $cur->find($cur_files[$b]))
-                {
-                    $change->type = 'modified';
-                    $change->subject = $prev_files[$a];
-                    array_push($changes, $change);
-                }
-                $a++;
-                $b++;
-            }
+
+            array_push($changes, $change);
         }
         foreach ($changes as $change)
         {
