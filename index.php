@@ -28,6 +28,8 @@ function ls_r($path)
     $dirs = array('');
     $r = array();
 
+    if (!file_exists($path))
+        return NULL;
     while (($dir = array_shift($dirs)) !== NULL)
     {
         $d = opendir($path.'/'.$dir);
