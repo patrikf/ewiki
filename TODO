@@ -11,8 +11,6 @@ lost. Maybe there could also be a "pending merges" page.
 
 * show unmerged conflicts on the page itself
 
-* authentication
-
 == less important
 * server-side caching?
 * client-side caching?
@@ -20,6 +18,7 @@ lost. Maybe there could also be a "pending merges" page.
 * revamped markup
 * support for inline images?
 * support for viewing commit details, author details
+* preview
 
 * proper support for merge commits in history?
 The current approach simply sorts commits by time to achieve a somewhat
