@@ -432,7 +432,10 @@ else if ($action == 'edit') // {{{1
             $newcommit->author = $stamp;
             $newcommit->committer = $stamp;
 
-            $newcommit->summary = sprintf('%s: %s', $page->getName(), $_POST['summary']);
+            $summary = $_POST['summary'];
+            if (strpos($summary, $page->getName()) === FALSE)
+                $summary = sprintf('%s: %s', $page->getName(), $summary);
+            $newcommit->summary = $summary;
             $newcommit->detail = '';
             $newcommit->rehash();
             array_push($pending, $newcommit);
@@ -519,6 +522,15 @@ else if ($action == 'edit') // {{{1
         }
         else
             $view->content = ($view->page_type == WikiPage::TYPE_PAGE ? $page->object->data : '');
+
+        if (isset($content))
+            $view->summary = $_POST['summary'];
+        else
+        {
+            $view->summary = sprintf('%s: ', $page->getName());
+            if (!$view->page_type)
+                $view->summary .= 'create page';
+        }
 
         $view->display();
     }

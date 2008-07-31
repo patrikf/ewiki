@@ -41,7 +41,7 @@
 
 <div class="par">
     Summary of changes:
-    <input type="text" name="summary" class="text" />
+    <input type="text" name="summary" class="text" value="<?= htmlspecialchars($summary, 0, 'UTF-8') ?>" />
     <div class="submit">
         <input type="submit" class="submit" id="edit-preview" name="preview" value="Preview" />
         <input type="submit" class="submit" value="Save changes" />
