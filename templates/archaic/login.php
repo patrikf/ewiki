@@ -15,8 +15,8 @@ Sorry, wrong username or password.
     Password:
     <input type="password" name="password" class="text" />
 </p>
-<p>
-    <input type="submit" value="Login" class="submit" />
-</p>
+<div class="par submit">
+<input type="submit" value="Login" class="submit" />
+</div>
 </form>
 <? include('footer.php'); ?>
