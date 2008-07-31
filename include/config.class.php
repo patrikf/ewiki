@@ -38,7 +38,16 @@ final class Config
     // The default maximum image height
     const IMAGE_HEIGHT = 480;
 
-    // The DSN of the database to use
+    // Whether the wiki provides user management
+    const AUTHENTICATION = false;
+
+    // Whether the website requires authentication to view pages
+    const REQUIRE_LOGIN = Config::AUTHENTICATION;
+
+    /*
+     * The DSN of the database to use.
+     * Only used if Config::AUTHENTICATION is true
+     */
     const DSN = 'pgsql:';
 }
 

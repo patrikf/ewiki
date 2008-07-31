@@ -56,21 +56,27 @@ function gentoken($len, $chrs='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw
     return $str;
 }
 
-$pdo = new PDO(Config::DSN);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+if (Config::AUTHENTICATION)
+{
+    $pdo = new PDO(Config::DSN);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+}
 
 $view = new View;
 
 $user = NULL;
-if (isset($_COOKIE['session']))
+if (Config::AUTHENTICATION)
 {
-    $stmt = $pdo->prepare('SELECT * FROM ewiki_users WHERE "session" = :session');
-    $stmt->execute(array('session' => $_COOKIE['session']));
-    $user = $stmt->fetchObject();
-    $stmt->closeCursor();
+    if (isset($_COOKIE['session']))
+    {
+        $stmt = $pdo->prepare('SELECT * FROM ewiki_users WHERE "session" = :session');
+        $stmt->execute(array('session' => $_COOKIE['session']));
+        $user = $stmt->fetchObject();
+        $stmt->closeCursor();
 
-    if ($user === FALSE)
-        $user = NULL;
+        if ($user === FALSE)
+            $user = NULL;
+    }
 }
 
 $view->user = $user;
@@ -109,7 +115,7 @@ else
     $view->page = $page;
 }
 
-if (!$user || $special[0] == 'login') // {{{1
+if ((Config::REQUIRE_LOGIN && !$user) || (Config::AUTHENTICATION && $special[0] == 'login')) // {{{1
 {
     $view->setTemplate('login.php');
 
@@ -247,7 +253,7 @@ else if ($special[0] == 'merge') // {{{1
 
     $view->display();
 }
-else if ($special[0] == 'profile') // {{{1
+else if ($user && $special[0] == 'profile') // {{{1
 {
     $view->setTemplate('edit-profile.php');
 

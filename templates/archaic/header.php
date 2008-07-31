@@ -17,6 +17,8 @@
         <a href="<?= Config::PATH ?>/:profile">change password/email</a>
         <a href="<?= Config::PATH ?>/:logout">logout</a>
     </div>
+    <? endif; ?>
+    <? if (!Config::REQUIRE_LOGIN || $user): ?>
     <div id="globallinks">
         <a href="<?= Config::PATH ?>/">home</a>
         <a href="<?= Config::PATH ?>/:recent">recent changes</a>
