@@ -150,10 +150,14 @@ input.text
     padding: .25em;
 }
 
+div.submit
+{
+    text-align: right;
+}
+
 input.submit
 {
-    display: block;
-    margin: .75em 0px .75em auto;
+    margin: .75em 0px .75em .5em;
 }
 
 .hidden
@@ -187,7 +191,7 @@ div.commits .commit .changes
 }
 
 div.error,
-div.history-warning
+div.warning
 {
     padding: .5em 1em;
     margin: 1em 0px;
@@ -195,7 +199,7 @@ div.history-warning
     font-size: .8em;
 }
 
-div.history-warning
+div.warning
 {
     background-color: #FFE;
     border: 1px solid #FA0;
@@ -205,5 +209,11 @@ div.error
 {
     background-color: #FEE;
     border: 1px solid #F00;
+}
+
+div.preview
+{
+    padding-bottom: 3em;
+    border-bottom: 3px solid #000;
 }
 

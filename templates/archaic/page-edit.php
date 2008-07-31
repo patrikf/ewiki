@@ -2,6 +2,11 @@
 <? include('header.php'); ?>
 <h1 id="pagetitle"><?= Markup::escape($page->getName()); ?></h1>
 <? if (Config::ALLOW_EDIT): ?>
+<? if (isset($preview)): ?>
+<div id="edit-preview" class="preview"><?= $preview ?></div>
+<? else: ?>
+<div id="edit-preview" class="preview hidden"></div>
+<? endif; ?>
 <form id="edit-form" enctype="multipart/form-data" accept-charset="UTF-8" method="post" action="<?= $page->getURL() ?>?action=edit&amp;commit=<?= $commit_id ?>">
 <div class="par">
     <input type="radio" name="type" value="file" class="form-opt" id="file-opt"<?= $is_binary ? ' checked="checked"' : '' ?> /><!--
@@ -38,7 +43,8 @@
     Summary of changes:
     <input type="text" name="summary" class="text" />
     <div class="submit">
-        <input type="submit" value="Save changes" class="submit" />
+        <input type="submit" class="submit" id="edit-preview" name="preview" value="Preview" />
+        <input type="submit" class="submit" value="Save changes" />
     </div>
 </div>
 </form>
