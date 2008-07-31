@@ -17,23 +17,9 @@ class MIME
         return $this->substr($pos, $end-$pos);
     }
 
-    protected function uint16_at($pos)
-    {
-        return ord($this->cache{$pos+0}) << 8 | ord($this->cache{$pos+1});
-    }
-
-    protected function uint32_at($pos)
-    {
-        return ord($this->cache{$pos+0}) << 24 | ord($this->cache{$pos+1}) << 16 | ord($this->cache{$pos+2}) << 8 | ord($this->cache{$pos+3});
-    }
-
-    protected function nuint32_at($pos, $n)
-    {
-        $r = array();
-        for ($i = 0; $i < $n; $i++, $pos += 4)
-            array_push($r, $this->uint32_at($pos));
-        return $r;
-    }
+    protected function uint16_at($pos) { return Binary::uint16($this->cache, $pos); }
+    protected function uint32_at($pos) { return Binary::uint32($this->cache, $pos); }
+    protected function nuint32_at($pos, $n) { return Binary::nuint32($n, $this->cache, $pos); }
 
     public function __construct($mime_cache='/usr/share/mime/mime.cache')
     {

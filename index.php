@@ -16,6 +16,7 @@ require_once('markup.class.php');
 require_once('wikipage.class.php');
 require_once('view.class.php');
 require_once('mime.class.php');
+require_once('binary.class.php');
 
 function redirect($uri)
 {
