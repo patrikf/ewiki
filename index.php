@@ -204,6 +204,8 @@ else if ($special[0] == 'conflicts') // {{{1
     $view->setTemplate('conflicts.php');
 
     $conflicts = ls_r(sprintf('%s/refs/heads/%s', Config::GIT_PATH, Config::GIT_CONFLICT_BRANCH_DIR));
+    if (!$conflicts)
+        $conflicts = array();
     sort($conflicts);
     $view->conflicts = array();
     foreach ($conflicts as $name)
