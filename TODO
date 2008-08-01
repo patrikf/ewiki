@@ -1,16 +1,3 @@
-== important
-* conflict resolution
-Allow the user to resolve conflicts when a fast-forward merge of an edited
-page fails. The code should first check whether the file being edited has
-actually been modified in the meantime, and if so, present the user with two
-text areas (his just-submitted version, and the current tip of the branch) to
-allow interactive merges.
-
-Ideally, for each conflict, a topic branch is created to ensure no work is
-lost. Maybe there could also be a "pending merges" page.
-
-* show unmerged conflicts on the page itself
-
 == less important
 * server-side caching?
 * client-side caching?
@@ -18,7 +5,13 @@ lost. Maybe there could also be a "pending merges" page.
 * revamped markup
 * support for inline images?
 * support for viewing commit details, author details
-* preview
+* JavaScript XHR preview
+
+* online conflict resolution
+The user should be presented with two text areas (his just-submitted version,
+and the current tip of the branch) to allow interactive merges.
+
+* show unmerged conflicts on the page itself
 
 * proper support for merge commits in history?
 The current approach simply sorts commits by time to achieve a somewhat
