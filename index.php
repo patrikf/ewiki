@@ -203,19 +203,21 @@ else if ($special[0] == 'conflicts') // {{{1
 {
     $view->setTemplate('conflicts.php');
 
-    $conflicts = ls_r(sprintf('%s/refs/heads/%s', Config::GIT_PATH, Config::GIT_CONFLICT_BRANCH_DIR));
-    if (!$conflicts)
-        $conflicts = array();
-    sort($conflicts);
-    $view->conflicts = array();
-    foreach ($conflicts as $name)
+    $conflict_branches = ls_r(sprintf('%s/refs/heads/%s', Config::GIT_PATH, Config::GIT_CONFLICT_BRANCH_DIR));
+    if (!$conflict_branches)
+        $conflict_branches = array();
+    sort($conflict_branches);
+    $conflicts = array();
+    foreach ($conflict_branches as $name)
     {
         $obj = new stdClass;
         $obj->branch = sprintf('%s/%s', Config::GIT_CONFLICT_BRANCH_DIR, $name);
         $obj->merge_url = sprintf('%s/:merge/%s', Config::PATH, join('/', array_map('urlencode', explode('/', $obj->branch))));
 
-        array_push($view->conflicts, $obj);
+        array_push($conflicts, $obj);
     }
+
+    $view->conflicts = $conflicts;
 
     $view->display();
 }
