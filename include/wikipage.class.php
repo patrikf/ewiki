@@ -26,14 +26,8 @@ class WikiPage
         if ($commit === NULL)
             $commit = $repo->getObject($repo->getHead(Config::GIT_BRANCH));
         $this->commit = $commit;
-        try
-        {
-            $this->object = $commit->repo->getObject($commit->find($path));
-        }
-        catch (GitTreeNotFoundError $e)
-        {
-            $this->object = NULL;
-        }
+        $name = $commit->find($path);
+        $this->object = $name ? $commit->repo->getObject($name) : NULL;
     }
 
     public function getURL()
@@ -126,16 +120,8 @@ class WikiPage
         {
             $entry = new stdClass;
             $entry->commit = $commit;
-            try
-            {
-                $entry->blob = $commit->repo->getObject($commit->find($this->path));
-                $blobname = $entry->blob->getName();
-            }
-            catch (GitTreeNotFoundError $e)
-            {
-                $entry->blob = NULL;
-                $blobname = NULL;
-            }
+            $blobname = $commit->find($this->path);
+            $entry->blob = $blobname ? $commit->repo->getObject($blobname) : NULL;
             if ($blobname != $lastblob)
                 array_push($history, $entry);
             $lastblob = $blobname;
