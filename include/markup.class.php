@@ -44,9 +44,11 @@ class Markup
                 $in = substr($in, 2);
             }
             else if ($context == 'cell' && (substr($in, 0, 1) == '|' || substr($in, 0, 1) == "\n"))
-                return;
-            else if ($context == 'list_element' && $newlines)
-                return;
+                return 0;
+            else if ($context == 'list_element' && $newlines >= 2)
+                return 1;
+            else if ($context == 'list_element' && $newlines && $in{0} == '*')
+                return 0;
             else if (substr($in, 0, 1) == "\n")
             {
                 $newlines++;
@@ -80,7 +82,7 @@ class Markup
                 $out .= '</p>';
             }
             else if ($context == 'par' && $newlines >= 2)
-                return;
+                return 0;
             else if (!$raw && substr($in, 0, 2) == '[[')
             {
                 $in = substr($in, 2);
@@ -102,9 +104,9 @@ class Markup
                 $in = substr($in, 2);
             }
             else if ($context == 'link_target' && substr($in, 0, 1) == '|')
-                return;
+                return 0;
             else if (($context == 'link_target' || $context == 'link_title') && substr($in, 0, 2) == ']]')
-                return;
+                return 0;
             else if ($context == 'table')
             {
                 if (substr($in, 0, 1) == '|')
@@ -121,28 +123,29 @@ class Markup
                     $out .= '</tr>';
                 }
                 else
-                    return;
+                    return 0;
             }
             else if ($context == 'list')
             {
-                while (substr($in, 0, 1) == '*')
+                $r = 0;
+                while (substr($in, 0, 1) == '*' && !$r)
                 {
                     $in = substr($in, 1);
                     $out .= '<li>';
-                    Markup::parse($in, $out, 'list_element');
+                    $r = Markup::parse($in, $out, 'list_element');
                     $out .= '</li>';
                 }
-                return;
+                return 0;
             }
             else if ($context == 'strong' && substr($in, 0, 3) == "'''")
             {
                 $in = substr($in, 3);
-                return;
+                return 0;
             }
             else if ($context == 'emph' && substr($in, 0, 2) == "''")
             {
                 $in = substr($in, 2);
-                return;
+                return 0;
             }
             else if (!$raw && substr($in, 0, 3) == "'''")
             {
@@ -180,6 +183,7 @@ class Markup
             }
             $newlines = 0;
         }
+        return 0;
     }
 
     public static function format($in)
