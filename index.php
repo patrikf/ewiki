@@ -557,33 +557,39 @@ else if ($action == 'image') // {{{1
         // Resize (oh god why does php not have a simple image_resize function?)
         $old_image = imagecreatefromstring($page->object->data);
         $old_size = array(imagesx($old_image), imagesy($old_image));
-        $new_size = array((int)$_GET['width'], (int)$_GET['height']);
+        $new_size = array(isset($_GET['width'])  ? (int)$_GET['width']  : 0,
+                          isset($_GET['height']) ? (int)$_GET['height'] : 0);
         if (!$new_size[0])
             $new_size[0] = $old_size[0];
         if (!$new_size[1])
             $new_size[1] = $old_size[1];
         $factor = min($new_size[0] / $old_size[0], $new_size[1] / $old_size[1]); // Keep aspect ratio
-        if ($factor < 1)
-        {
-            $new_size = array((int)($old_size[0] * $factor), (int)($old_size[1] * $factor));
-            $new_image = imagecreatetruecolor($new_size[0], $new_size[1]);
-            imagecopyresampled($new_image, $old_image, 0, 0, 0, 0, $new_size[0], $new_size[1], $old_size[0], $old_size[1]);
+        if ($factor >= 1)
             imagedestroy($old_image);
-        }
-        else
-            $new_image = $old_image; // No resize if image already has the right size or is smaller than wanted size
+    }
+    else
+        $factor = 1;
+
+    if ($factor < 1)
+    {
+        $new_size = array($old_size[0] * $factor, $old_size[1] * $factor);
+        $new_image = imagecreatetruecolor($new_size[0], $new_size[1]);
+        imagealphablending($new_image, FALSE);
+        imagecopyresampled($new_image, $old_image, 0, 0, 0, 0, $new_size[0], $new_size[1], $old_size[0], $old_size[1]);
+        imagedestroy($old_image);
 
         // Send the image
+        imagesavealpha($new_image, TRUE);
         switch ($page->getMimeType())
         {
             case 'image/gif':
                 imagegif($new_image);
                 break;
             case 'image/jpeg':
-                imagejpeg($new_image, null, 100);
+                imagejpeg($new_image);
                 break;
             case 'image/png':
-                imagepng($new_image, null, 9);
+                imagepng($new_image);
                 break;
             case 'image/vnd.wap.wbmp':
                 imagewbmp($new_image);
