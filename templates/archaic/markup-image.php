@@ -1,5 +1,5 @@
 <? if ($page_type == WikiPage::TYPE_IMAGE): ?>
-<div class="image">
+<div class="par image">
     <a href="<?= $page->getURL() ?>">
         <img
             src="<?= $page->getURL() ?>?action=image&amp;width=<?= $width ?>&amp;height=<?= $height ?>"
