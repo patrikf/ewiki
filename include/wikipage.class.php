@@ -47,7 +47,7 @@ class WikiPage
 
     public function link()
     {
-        return sprintf('<a href="%s">%s</a>', $this->getURL(), Markup::escape($this->getName()));
+        return sprintf('<a href="%s"%s>%s</a>', $this->getURL(), $this->object ? '' : ' class="new"', Markup::escape($this->getName()));
     }
 
     public function format()
