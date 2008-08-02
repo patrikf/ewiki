@@ -557,7 +557,7 @@ else if ($action == 'image') // {{{1
         // Resize (oh god why does php not have a simple image_resize function?)
         $old_image = imagecreatefromstring($page->object->data);
         $old_size = array(imagesx($old_image), imagesy($old_image));
-        $new_size = array((int)$_GET['width'], (int)$_GET['width']);
+        $new_size = array((int)$_GET['width'], (int)$_GET['height']);
         if (!$new_size[0])
             $new_size[0] = $old_size[0];
         if (!$new_size[1])
