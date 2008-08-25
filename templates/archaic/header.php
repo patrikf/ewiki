@@ -6,6 +6,9 @@
 <link rel="stylesheet" href="<?= Config::PATH . '/templates/' . Config::TEMPLATE . '/style.css' ?>" />
 <script type="text/javascript" src="<?= Config::PATH ?>/mootools-1.2-core-nc.js"></script>
 <script type="text/javascript" src="<?= Config::PATH ?>/templates/<?= Config::TEMPLATE ?>/site.js"></script>
+<? if (Config::ALLOW_EDIT && isset($page)): ?>
+<link rel="alternate" type="application/x-wiki" title="Edit this page!" href="<?= $page->getUrl() ?>?action=edit" />
+<? endif; ?>
 </head>
 <body>
 <div id="page">
