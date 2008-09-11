@@ -128,6 +128,11 @@ if ((Config::REQUIRE_LOGIN && !$user) || (Config::AUTHENTICATION && $special[0] 
 {
     $view->setTemplate('login.php');
 
+    $goto = $parts;
+    if ($special)
+        $goto[0] = '/'.$special[1];
+    $goto = implode('?', $goto);
+    $view->goto = $goto;
     $view->wrong = FALSE;
     if (isset($_POST['user']) && isset($_POST['password']))
     {
@@ -144,7 +149,7 @@ if ((Config::REQUIRE_LOGIN && !$user) || (Config::AUTHENTICATION && $special[0] 
             $stmt->closeCursor();
 
             setcookie('session', $session, 0, Config::PATH . '/');
-            redirect(Config::PATH . '/');
+            redirect(Config::PATH . $goto);
             exit(0);
         }
         else
