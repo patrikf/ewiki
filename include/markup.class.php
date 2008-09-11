@@ -16,6 +16,7 @@ class Markup
         else if ($parts[0] == 'wp')
         {
             $url = 'http://en.wikipedia.org/wiki/'.strtr(implode('/', array_map('urlencode', explode('/', $parts[1]))), '+', '_');
+            $ref = $parts[1].' (Wikipedia)';
         }
         else
             $url = $ref;
