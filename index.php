@@ -323,14 +323,15 @@ else if ($action == 'view') // {{{1
 
     if ($type == WikiPage::TYPE_TREE)
     {
-        $view->entries = array();
+        $entries = array();
         foreach ($page->listEntries() as $entry)
         {
             $obj = new stdClass;
             $obj->url = $entry->getURL() . ($link_to_tip ? '' : '?commit='.$commit_id);
             $obj->name = $entry->getName();
-            array_push($view->entries, $obj);
+            array_push($entries, $obj);
         }
+        $view->entries = $entries;
     }
     else if ($type == NULL)
     {
