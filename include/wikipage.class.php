@@ -128,5 +128,22 @@ class WikiPage
         }
         return $history;
     }
+
+    public function getLastModified()
+    {
+        $commits = $this->commit->getHistory();
+        $commits = array_reverse($commits);
+        $r = NULL;
+        $lastblob = $this->object->getName();
+        foreach ($commits as $commit)
+        {
+            $blobname = $commit->find($this->path);
+            if ($blobname != $lastblob)
+                break;
+            $r = $commit->committer->time;
+        }
+        assert($r !== NULL); /* something is seriously wrong if this happens */
+        return $r;
+    }
 }
 

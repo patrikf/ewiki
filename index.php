@@ -18,6 +18,7 @@ require_once('wikipage.class.php');
 require_once('view.class.php');
 require_once('mime.class.php');
 require_once('binary.class.php');
+require_once('cache.class.php');
 
 // Functions {{{1
 function redirect($uri) // {{{2
@@ -314,306 +315,314 @@ else if ($special[0] == 'logout') // {{{1
 }
 else if ($special !== NULL) // {{{1
     throw new Exception(sprintf('unknown special: %s', $special[0]));
-else if ($action == 'view') // {{{1
+else // page-related {{{1
 {
-    $view->setTemplate('page-view.php');
+    header('Pragma: no-cache');
+    header('Cache-Control: private, must-revalidate');
+    Cache::cache($page->getLastModified());
 
-    $type = $page->getPageType();
-    $view->type = $type;
-
-    if ($type == WikiPage::TYPE_TREE)
+    if ($action == 'view') // {{{2
     {
-        $entries = array();
-        foreach ($page->listEntries() as $entry)
+        $view->setTemplate('page-view.php');
+
+        $type = $page->getPageType();
+        $view->type = $type;
+
+        if ($type == WikiPage::TYPE_TREE)
         {
-            $obj = new stdClass;
-            $obj->url = $entry->getURL() . ($link_to_tip ? '' : '?commit='.$commit_id);
-            $obj->name = $entry->getName();
-            array_push($entries, $obj);
-        }
-        $view->entries = $entries;
-    }
-    else if ($type == NULL)
-    {
-        $view->has_history = !!count($page->getPageHistory());
-    }
-    $view->display();
-}
-else if ($action == 'history') // {{{1
-{
-    $view->setTemplate('page-history.php');
-
-    $history = $page->getPageHistory();
-    foreach ($history as $entry)
-    {
-        $entry->summary = $entry->commit->summary;
-        $entry->author = $entry->commit->author->name;
-        $entry->time = $entry->commit->committer->time;
-	$entry->commit = sha1_hex($entry->commit->getName());
-	$entry->blob = $entry->blob ? sha1_hex($entry->blob->getName()) : NULL;
-    }
-    $view->history = array_reverse($history);
-
-    $view->display();
-}
-else if ($action == 'edit') // {{{1
-{
-    $committed = FALSE;
-    if (isset($_POST['content']) && Config::ALLOW_EDIT)
-    {
-        if ($_POST['type'] == 'file')
-            $content = file_get_contents($_FILES['file']['tmp_name']);
-        else
-            $content = str_replace("\r", '', str_replace("\r\n", "\n", $_POST['content']));
-
-        if (!isset($_POST['preview']))
-        {
-            // Merge {{{
-            /* first, create all new objects in memory */
-            /* pending: contains all objects that need to be written */
-            $pending = array();
-
-            $blob = new GitBlob($repo);
-            array_push($pending, $blob);
-            $blob->data = $content;
-            $blob->rehash();
-
-            $f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_BRANCH), 'a+b');
-            flock($f, LOCK_EX);
-            $ref = stream_get_contents($f);
-
-            $fast_forward = FALSE;
-            $fast_merge = FALSE;
-            $commit_base = $commit;
-            if (strlen($ref) == 0)
+            $entries = array();
+            foreach ($page->listEntries() as $entry)
             {
-                /* create branch from scratch */
-                $fast_forward = TRUE;
+                $obj = new stdClass;
+                $obj->url = $entry->getURL() . ($link_to_tip ? '' : '?commit='.$commit_id);
+                $obj->name = $entry->getName();
+                array_push($entries, $obj);
             }
+            $view->entries = $entries;
+        }
+        else if ($type == NULL)
+        {
+            $view->has_history = !!count($page->getPageHistory());
+        }
+        $view->display();
+    }
+    else if ($action == 'history') // {{{2
+    {
+        $view->setTemplate('page-history.php');
+
+        $history = $page->getPageHistory();
+        foreach ($history as $entry)
+        {
+            $entry->summary = $entry->commit->summary;
+            $entry->author = $entry->commit->author->name;
+            $entry->time = $entry->commit->committer->time;
+            $entry->commit = sha1_hex($entry->commit->getName());
+            $entry->blob = $entry->blob ? sha1_hex($entry->blob->getName()) : NULL;
+        }
+        $view->history = array_reverse($history);
+
+        $view->display();
+    }
+    else if ($action == 'edit') // {{{2
+    {
+        $committed = FALSE;
+        if (isset($_POST['content']) && Config::ALLOW_EDIT)
+        {
+            if ($_POST['type'] == 'file')
+                $content = file_get_contents($_FILES['file']['tmp_name']);
             else
+                $content = str_replace("\r", '', str_replace("\r\n", "\n", $_POST['content']));
+
+            if (!isset($_POST['preview']))
             {
-                $ref = sha1_bin($ref);
-                if ($ref == $commit->getName())
+                // Merge {{{
+                /* first, create all new objects in memory */
+                /* pending: contains all objects that need to be written */
+                $pending = array();
+
+                $blob = new GitBlob($repo);
+                array_push($pending, $blob);
+                $blob->data = $content;
+                $blob->rehash();
+
+                $f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_BRANCH), 'a+b');
+                flock($f, LOCK_EX);
+                $ref = stream_get_contents($f);
+
+                $fast_forward = FALSE;
+                $fast_merge = FALSE;
+                $commit_base = $commit;
+                if (strlen($ref) == 0)
                 {
-                    /* no new commits */
+                    /* create branch from scratch */
                     $fast_forward = TRUE;
                 }
                 else
                 {
-                    $tip = $repo->getObject($ref);
-                    try
+                    $ref = sha1_bin($ref);
+                    if ($ref == $commit->getName())
                     {
-                        if ($tip->find($page->path) == $commit->find($page->path))
-                        {
-                            /*
-                             * New commits have been made, but the concerned file
-                             * has the same contents as when we started editing. We
-                             * directly perform the trivial merge.
-                             */
-                            $fast_merge = TRUE;
-                        }
+                        /* no new commits */
+                        $fast_forward = TRUE;
                     }
-                    catch (GitTreeError $e) {}
+                    else
+                    {
+                        $tip = $repo->getObject($ref);
+                        try
+                        {
+                            if ($tip->find($page->path) == $commit->find($page->path))
+                            {
+                                /*
+                                 * New commits have been made, but the concerned file
+                                 * has the same contents as when we started editing. We
+                                 * directly perform the trivial merge.
+                                 */
+                                $fast_merge = TRUE;
+                            }
+                        }
+                        catch (GitTreeError $e) {}
+                    }
                 }
-            }
 
-            $tree = clone $repo->getObject($commit->tree);
-            $pending = array_merge($pending, $tree->updateNode($page->path, 0100640, $blob->getName()));
-            $tree->rehash();
-            array_push($pending, $tree);
-
-            $newcommit = new GitCommit($repo);
-            $newcommit->tree = $tree->getName();
-            $newcommit->parents = array($commit->getName());
-            $stamp = new GitCommitStamp;
-            if ($user)
-            {
-                $stamp->name = $user->name;
-                $stamp->email = $user->email;
-            }
-            else
-            {
-                $stamp->name = $_SERVER['REMOTE_ADDR'];
-                $stamp->email = sprintf('anonymous@%s', $_SERVER['REMOTE_ADDR']);
-            }
-            $stamp->time = time();
-            $stamp->offset = idate('Z', $stamp->time);
-
-            $newcommit->author = $stamp;
-            $newcommit->committer = $stamp;
-
-            $summary = $_POST['summary'];
-            if (strpos($summary, $page->getName()) === FALSE)
-                $summary = sprintf('%s: %s', $page->getName(), $summary);
-            $newcommit->summary = $summary;
-            $newcommit->detail = '';
-            $newcommit->rehash();
-            array_push($pending, $newcommit);
-
-            if ($fast_merge)
-            {
-                /* create merge commit */
-
-                $tree = clone $repo->getObject($tip->tree);
+                $tree = clone $repo->getObject($commit->tree);
                 $pending = array_merge($pending, $tree->updateNode($page->path, 0100640, $blob->getName()));
                 $tree->rehash();
                 array_push($pending, $tree);
 
-                $merge_base = $newcommit;
-
                 $newcommit = new GitCommit($repo);
                 $newcommit->tree = $tree->getName();
-                $newcommit->parents = array($tip->getName(), $merge_base->getName());
+                $newcommit->parents = array($commit->getName());
+                $stamp = new GitCommitStamp;
+                if ($user)
+                {
+                    $stamp->name = $user->name;
+                    $stamp->email = $user->email;
+                }
+                else
+                {
+                    $stamp->name = $_SERVER['REMOTE_ADDR'];
+                    $stamp->email = sprintf('anonymous@%s', $_SERVER['REMOTE_ADDR']);
+                }
+                $stamp->time = time();
+                $stamp->offset = idate('Z', $stamp->time);
+
                 $newcommit->author = $stamp;
                 $newcommit->committer = $stamp;
-                $newcommit->summary = 'Fast merge';
+
+                $summary = $_POST['summary'];
+                if (strpos($summary, $page->getName()) === FALSE)
+                    $summary = sprintf('%s: %s', $page->getName(), $summary);
+                $newcommit->summary = $summary;
                 $newcommit->detail = '';
                 $newcommit->rehash();
                 array_push($pending, $newcommit);
-            }
 
-            if (!$fast_forward && !$fast_merge)
-            {
+                if ($fast_merge)
+                {
+                    /* create merge commit */
+
+                    $tree = clone $repo->getObject($tip->tree);
+                    $pending = array_merge($pending, $tree->updateNode($page->path, 0100640, $blob->getName()));
+                    $tree->rehash();
+                    array_push($pending, $tree);
+
+                    $merge_base = $newcommit;
+
+                    $newcommit = new GitCommit($repo);
+                    $newcommit->tree = $tree->getName();
+                    $newcommit->parents = array($tip->getName(), $merge_base->getName());
+                    $newcommit->author = $stamp;
+                    $newcommit->committer = $stamp;
+                    $newcommit->summary = 'Fast merge';
+                    $newcommit->detail = '';
+                    $newcommit->rehash();
+                    array_push($pending, $newcommit);
+                }
+
+                if (!$fast_forward && !$fast_merge)
+                {
+                    fclose($f);
+
+                    /* create conflict branch */
+
+                    $dir = sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_CONFLICT_BRANCH_DIR);
+                    if (!file_exists($dir))
+                        mkdir($dir, 0755);
+                    if (!is_dir($dir))
+                        throw new Exception(sprintf('%s is not a directory', $dir));
+                    if (!is_writable($dir))
+                        throw new Exception(sprintf('cannot write to %s', $dir));
+
+                    $f = FALSE;
+                    for ($i = 1; !$f; $i++)
+                    {
+                        $branch = sprintf('%s/%02d', Config::GIT_CONFLICT_BRANCH_DIR, $i);
+                        try
+                        {
+                            $f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, $branch), 'xb');
+                        }
+                        catch (Exception $e)
+                        {
+                            /*
+                             * fopen() will raise a warning if the file already
+                             * exists, which Core will make into an Exception.
+                             */
+                        }
+                    }
+                    flock($f, LOCK_EX);
+                }
+                foreach ($pending as $obj)
+                    $obj->write();
+                ftruncate($f, 0);
+                fwrite($f, sha1_hex($newcommit->getName()));
                 fclose($f);
 
-                /* create conflict branch */
-
-                $dir = sprintf('%s/refs/heads/%s', $repo->dir, Config::GIT_CONFLICT_BRANCH_DIR);
-                if (!file_exists($dir))
-                    mkdir($dir, 0755);
-                if (!is_dir($dir))
-                    throw new Exception(sprintf('%s is not a directory', $dir));
-                if (!is_writable($dir))
-                    throw new Exception(sprintf('cannot write to %s', $dir));
-
-                $f = FALSE;
-                for ($i = 1; !$f; $i++)
-                {
-                    $branch = sprintf('%s/%02d', Config::GIT_CONFLICT_BRANCH_DIR, $i);
-                    try
-                    {
-                        $f = fopen(sprintf('%s/refs/heads/%s', $repo->dir, $branch), 'xb');
-                    }
-                    catch (Exception $e)
-                    {
-                        /*
-                         * fopen() will raise a warning if the file already
-                         * exists, which Core will make into an Exception.
-                         */
-                    }
-                }
-                flock($f, LOCK_EX);
+                if ($fast_forward || $fast_merge)
+                    redirect($page->getURL());
+                else
+                    redirect(sprintf('%s/:merge/%s?fresh', Config::PATH, join('/', array_map('urlencode', explode('/', $branch)))));
+                // }}}
+                $committed = TRUE;
             }
-            foreach ($pending as $obj)
-                $obj->write();
-            ftruncate($f, 0);
-            fwrite($f, sha1_hex($newcommit->getName()));
-            fclose($f);
+        }
 
-            if ($fast_forward || $fast_merge)
-                redirect($page->getURL());
+        if (!$committed)
+        {
+            $view->setTemplate('page-edit.php');
+            $view->page_type = $page->getPageType();
+            $view->is_binary = isset($content) ? $_POST['type'] == 'file' : ($view->page_type == WikiPage::TYPE_BINARY || $view->page_type == WikiPage::TYPE_IMAGE);
+            if (isset($content) && !$view->is_binary)
+            {
+                $view->content = $content;
+                if (isset($_POST['preview']))
+                    $view->preview = edit_preview($content);
+            }
             else
-                redirect(sprintf('%s/:merge/%s?fresh', Config::PATH, join('/', array_map('urlencode', explode('/', $branch)))));
-            // }}}
-            $committed = TRUE;
+                $view->content = ($view->page_type == WikiPage::TYPE_PAGE ? $page->object->data : '');
+
+            if (isset($content))
+                $view->summary = $_POST['summary'];
+            else
+            {
+                $view->summary = sprintf('%s: ', $page->getName());
+                if (!$view->page_type)
+                    $view->summary .= 'create page';
+            }
+
+            $view->display();
         }
     }
-
-    if (!$committed)
+    else if ($action == 'get') // {{{2
     {
-        $view->setTemplate('page-edit.php');
-        $view->page_type = $page->getPageType();
-        $view->is_binary = isset($content) ? $_POST['type'] == 'file' : ($view->page_type == WikiPage::TYPE_BINARY || $view->page_type == WikiPage::TYPE_IMAGE);
-        if (isset($content) && !$view->is_binary)
-        {
-            $view->content = $content;
-            if (isset($_POST['preview']))
-                $view->preview = edit_preview($content);
-        }
-        else
-            $view->content = ($view->page_type == WikiPage::TYPE_PAGE ? $page->object->data : '');
-
-        if (isset($content))
-            $view->summary = $_POST['summary'];
-        else
-        {
-            $view->summary = sprintf('%s: ', $page->getName());
-            if (!$view->page_type)
-                $view->summary .= 'create page';
-        }
-
-        $view->display();
-    }
-}
-else if ($action == 'get') // {{{1
-{
-    header('Content-Type: '.$page->getMimeType());
-    header('Content-Disposition: inline; filename="' . addcslashes($page->getName(), '"') . '"');
-    header('Content-Length: '.strlen($page->object->data));
-    echo $page->object->data;
-}
-else if ($action == 'image') // {{{1
-{
-    assert($page->getPageType() == WikiPage::TYPE_IMAGE);
-    header('Content-Type: '.$page->getMimeType());
-    header('Content-Disposition: inline; filename="' . addcslashes($page->getName(), '"') . '"');
-
-    if (isset($_GET['width']) || isset($_GET['height']))
-    {
-        // Resize (oh god why does php not have a simple image_resize function?)
-        $old_image = imagecreatefromstring($page->object->data);
-        $old_size = array(imagesx($old_image), imagesy($old_image));
-        $new_size = array(isset($_GET['width'])  ? (int)$_GET['width']  : 0,
-                          isset($_GET['height']) ? (int)$_GET['height'] : 0);
-        if (!$new_size[0])
-            $new_size[0] = $old_size[0];
-        if (!$new_size[1])
-            $new_size[1] = $old_size[1];
-        $factor = min($new_size[0] / $old_size[0], $new_size[1] / $old_size[1]); // Keep aspect ratio
-        if ($factor >= 1)
-            imagedestroy($old_image);
-    }
-    else
-        $factor = 1;
-
-    if ($factor < 1)
-    {
-        $new_size = array($old_size[0] * $factor, $old_size[1] * $factor);
-        $new_image = imagecreatetruecolor($new_size[0], $new_size[1]);
-        imagealphablending($new_image, FALSE);
-        imagecopyresampled($new_image, $old_image, 0, 0, 0, 0, $new_size[0], $new_size[1], $old_size[0], $old_size[1]);
-        imagedestroy($old_image);
-
-        // Send the image
-        imagesavealpha($new_image, TRUE);
-        switch ($page->getMimeType())
-        {
-            case 'image/gif':
-                imagegif($new_image);
-                break;
-            case 'image/jpeg':
-                imagejpeg($new_image);
-                break;
-            case 'image/png':
-                imagepng($new_image);
-                break;
-            case 'image/vnd.wap.wbmp':
-                imagewbmp($new_image);
-                break;
-            case 'image/x-xbitmap':
-                imagexbm($new_image);
-                break;
-            default:
-                throw new Exception(sprintf('unhandled image type: %s', $page->getMimeType()));
-        }
-        imagedestroy($new_image);
-    }
-    else
+        header('Content-Type: '.$page->getMimeType());
+        header('Content-Disposition: inline; filename="' . addcslashes($page->getName(), '"') . '"');
+        header('Content-Length: '.strlen($page->object->data));
         echo $page->object->data;
+    }
+    else if ($action == 'image') // {{{2
+    {
+        assert($page->getPageType() == WikiPage::TYPE_IMAGE);
+        header('Content-Type: '.$page->getMimeType());
+        header('Content-Disposition: inline; filename="' . addcslashes($page->getName(), '"') . '"');
 
+        if (isset($_GET['width']) || isset($_GET['height']))
+        {
+            // Resize (oh god why does php not have a simple image_resize function?)
+            $old_image = imagecreatefromstring($page->object->data);
+            $old_size = array(imagesx($old_image), imagesy($old_image));
+            $new_size = array(isset($_GET['width'])  ? (int)$_GET['width']  : 0,
+                              isset($_GET['height']) ? (int)$_GET['height'] : 0);
+            if (!$new_size[0])
+                $new_size[0] = $old_size[0];
+            if (!$new_size[1])
+                $new_size[1] = $old_size[1];
+            $factor = min($new_size[0] / $old_size[0], $new_size[1] / $old_size[1]); // Keep aspect ratio
+            if ($factor >= 1)
+                imagedestroy($old_image);
+        }
+        else
+            $factor = 1;
+
+        if ($factor < 1)
+        {
+            $new_size = array($old_size[0] * $factor, $old_size[1] * $factor);
+            $new_image = imagecreatetruecolor($new_size[0], $new_size[1]);
+            imagealphablending($new_image, FALSE);
+            imagecopyresampled($new_image, $old_image, 0, 0, 0, 0, $new_size[0], $new_size[1], $old_size[0], $old_size[1]);
+            imagedestroy($old_image);
+
+            // Send the image
+            imagesavealpha($new_image, TRUE);
+            switch ($page->getMimeType())
+            {
+                case 'image/gif':
+                    imagegif($new_image);
+                    break;
+                case 'image/jpeg':
+                    imagejpeg($new_image);
+                    break;
+                case 'image/png':
+                    imagepng($new_image);
+                    break;
+                case 'image/vnd.wap.wbmp':
+                    imagewbmp($new_image);
+                    break;
+                case 'image/x-xbitmap':
+                    imagexbm($new_image);
+                    break;
+                default:
+                    throw new Exception(sprintf('unhandled image type: %s', $page->getMimeType()));
+            }
+            imagedestroy($new_image);
+        }
+        else
+            echo $page->object->data;
+
+    }
+    else // {{{2
+        throw new Exception(sprintf('unhandled action: %s', $action));
+    // }}}2
 }
-else // {{{1
-    throw new Exception(sprintf('unhandled action: %s', $action));
 // }}}1
 
 /* vim:set fdm=marker fmr={{{,}}}: */
