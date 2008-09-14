@@ -22,7 +22,7 @@ require_once('binary.class.php');
 // Functions {{{1
 function redirect($uri) // {{{2
 {
-    header('HTTP/1.1 303 See Other');
+    header('Status: 303 See Other');
     header('Location: '.$uri);
 }
 
