@@ -9,7 +9,7 @@ final class Cache
         return gmdate('D, d M Y H:i:s', $timestamp).' GMT';
     }
 
-    static public function cache($last_modified=NULL, $if_modified_since=NULL)
+    static public function do_cache($last_modified=NULL, $if_modified_since=NULL)
     {
         if (!$last_modified)
             $last_modified = time();

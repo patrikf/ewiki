@@ -319,7 +319,7 @@ else // page-related {{{1
 {
     header('Pragma: no-cache');
     header('Cache-Control: private, must-revalidate');
-    Cache::cache($page->getLastModified());
+    Cache::do_cache($page->getLastModified());
 
     if ($action == 'view') // {{{2
     {
