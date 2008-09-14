@@ -1,7 +1,9 @@
+<ul>
 <? foreach ($entries as $entry): ?>
-    <p>
+    <li>
         <a href="<?= $entry->url ?>">
             <?= Markup::escape($entry->name) ?>
         </a>
-    </p>
+    </li>
 <? endforeach; ?>
+</ul>
