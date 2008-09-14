@@ -82,7 +82,7 @@ class Markup
                 else
                     $pos++;
                 if (!$is_comment)
-                    $out .= self::parseSpecial(substr($in, 1, $pos));
+                    $out .= self::parseSpecial(substr($in, 1, $pos-1));
                 $in = substr($in, $pos);
             }
             else if (substr($in, 0, 1) == '~')
