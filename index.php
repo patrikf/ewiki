@@ -317,8 +317,6 @@ else if ($special !== NULL) // {{{1
     throw new Exception(sprintf('unknown special: %s', $special[0]));
 else // page-related {{{1
 {
-    header('Cache-Control: private, must-revalidate, no-cache');
-    Cache::do_cache($page->getLastModified());
 
     if ($action == 'view') // {{{2
     {
@@ -553,6 +551,9 @@ else // page-related {{{1
     }
     else if ($action == 'get') // {{{2
     {
+        header('Cache-Control: private, must-revalidate, no-cache');
+        Cache::do_cache($page->getLastModified());
+
         header('Content-Type: '.$page->getMimeType());
         header('Content-Disposition: inline; filename="' . addcslashes($page->getName(), '"') . '"');
         header('Content-Length: '.strlen($page->object->data));
@@ -560,6 +561,9 @@ else // page-related {{{1
     }
     else if ($action == 'image') // {{{2
     {
+        header('Cache-Control: private, must-revalidate, no-cache');
+        Cache::do_cache($page->getLastModified());
+
         assert($page->getPageType() == WikiPage::TYPE_IMAGE);
         header('Content-Type: '.$page->getMimeType());
         header('Content-Disposition: inline; filename="' . addcslashes($page->getName(), '"') . '"');
