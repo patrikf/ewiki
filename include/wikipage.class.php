@@ -113,6 +113,8 @@ class WikiPage
 
     public function getPageHistory()
     {
+        if (!$this->object)
+            return array();
         $commits = $this->commit->getHistory();
         $history = array();
         $lastblob = NULL;
@@ -131,6 +133,8 @@ class WikiPage
 
     public function getLastModified()
     {
+        if (!$this->object)
+            return NULL;
         $commits = $this->commit->getHistory();
         $commits = array_reverse($commits);
         $r = NULL;
