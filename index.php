@@ -317,8 +317,7 @@ else if ($special !== NULL) // {{{1
     throw new Exception(sprintf('unknown special: %s', $special[0]));
 else // page-related {{{1
 {
-    header('Pragma: no-cache');
-    header('Cache-Control: private, must-revalidate');
+    header('Cache-Control: private, must-revalidate, no-cache');
     Cache::do_cache($page->getLastModified());
 
     if ($action == 'view') // {{{2
