@@ -116,19 +116,30 @@ class WikiPage
         if (!$this->object)
             return array();
         $commits = $this->commit->getHistory();
-        $history = array();
-        $lastblob = NULL;
+        $r = array();
         foreach ($commits as $commit)
         {
-            $entry = new stdClass;
-            $entry->commit = $commit;
-            $blobname = $commit->find($this->path);
-            $entry->blob = $blobname ? $commit->repo->getObject($blobname) : NULL;
-            if ($blobname != $lastblob)
-                array_push($history, $entry);
-            $lastblob = $blobname;
+            $common = FALSE;
+            foreach ($commit->parents as $parent)
+            {
+                $parent = $commit->repo->getObject($parent);
+                $blob = $parent->find($this->path);
+                if ($common === FALSE)
+                    $common = $blob;
+                else if ($blob !== $common)
+                {
+                    $common = TRUE;
+                    break;
+                }
+            }
+            if ($common === FALSE)
+                $common = NULL;
+
+            $blob = $commit->find($this->path);
+            if ($common !== $blob)
+                array_push($r, $commit);
         }
-        return $history;
+        return $r;
     }
 
     public function getLastModified()

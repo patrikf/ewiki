@@ -347,16 +347,18 @@ else // page-related {{{1
     {
         $view->setTemplate('page-history.php');
 
-        $history = $page->getPageHistory();
-        foreach ($history as $entry)
+        $commits = $page->getPageHistory();
+        $history = array();
+        foreach ($commits as $commit)
         {
-            $entry->summary = $entry->commit->summary;
-            $entry->author = $entry->commit->author->name;
-            $entry->time = $entry->commit->committer->time;
-            $entry->commit = sha1_hex($entry->commit->getName());
-            $entry->blob = $entry->blob ? sha1_hex($entry->blob->getName()) : NULL;
+            $entry = new stdClass;
+            $entry->summary = $commit->summary;
+            $entry->author = $commit->author->name;
+            $entry->time = $commit->committer->time;
+            $entry->commit = sha1_hex($commit->getName());
+            array_unshift($history, $entry);
         }
-        $view->history = array_reverse($history);
+        $view->history = $history;
 
         $view->display();
     }
