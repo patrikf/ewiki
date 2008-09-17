@@ -185,7 +185,7 @@ class MIME
         for ($i = 0; $i < 32 && $i < strlen($buf); $i++)
         {
             $c = ord($buf{$i});
-            if ($c < 0x20 && $c != 10 /* \n */)
+            if ($c < 0x20 && $c != 0x09 /* \t */ && $c != 0x0A /* \n */)
                 return TRUE;
         }
         return FALSE;
