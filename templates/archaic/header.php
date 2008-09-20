@@ -6,8 +6,14 @@
 <link rel="stylesheet" href="<?= Config::PATH . '/templates/' . Config::TEMPLATE . '/style.css' ?>" />
 <script type="text/javascript" src="<?= Config::PATH ?>/mootools-1.2-core-nc.js"></script>
 <script type="text/javascript" src="<?= Config::PATH ?>/templates/<?= Config::TEMPLATE ?>/site.js"></script>
-<? if (Config::ALLOW_EDIT && isset($page)): ?>
+<meta name="date" content="<?= date('r', (isset($page) ? $page->getLastModified() : time())) ?>" />
+<? if (isset($page)): ?>
+<? if ($action == 'edit'): ?>
+<meta name="robots" content="noindex,follow" />
+<? endif; ?>
+<? if (Config::ALLOW_EDIT): ?>
 <link rel="alternate" type="application/x-wiki" title="Edit this page!" href="<?= $page->getUrl() ?>?action=edit" />
+<? endif; ?>
 <? endif; ?>
 </head>
 <body>
