@@ -16,3 +16,10 @@ and the current tip of the branch) to allow interactive merges.
 * proper support for merge commits in history?
 The current approach simply sorts commits by time to achieve a somewhat
 sensible linear history. Using toposort would be a start.
+
+* non-breaking space in link texts?
+
+* commit IDs in links
+  - Images in past versions should probably appear as they were back then.
+  - Should the tree view spare out the commit ID if HEAD is viewed? I think
+    so. Compare how the rest of the code handles this and create consistent behaviour.
