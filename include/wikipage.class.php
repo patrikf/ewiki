@@ -160,5 +160,10 @@ class WikiPage
         assert($r !== NULL); /* something is seriously wrong if this happens */
         return $r;
     }
+
+    public function isValid()
+    {
+        return ($this->object && (!Config::IGNORE_EMPTY_PAGES || !empty($this->object->data)));
+    }
 }
 

@@ -10,7 +10,7 @@ class Markup
         if (count($parts) == 1)
         {
             $page = new WikiPage(explode('/', $ref));
-            $valid = ($page->object !== NULL);
+            $valid = $page->isValid();
             $url = $page->getURL();
         }
         else if ($parts[0] == 'wp')

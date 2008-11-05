@@ -49,5 +49,8 @@ final class Config
      * Only used if Config::AUTHENTICATION is true
      */
     const DSN = 'pgsql:';
+
+    // Treat empty files as non-existent
+    const IGNORE_EMPTY_PAGES = false;
 }
 
