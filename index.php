@@ -317,7 +317,6 @@ else if ($special !== NULL) // {{{1
     throw new Exception(sprintf('unknown special: %s', $special[0]));
 else // page-related {{{1
 {
-
     if ($action == 'view') // {{{2
     {
         $view->setTemplate('page-view.php');
@@ -327,15 +326,8 @@ else // page-related {{{1
 
         if ($type == WikiPage::TYPE_TREE)
         {
-            $entries = array();
-            foreach ($page->listEntries() as $entry)
-            {
-                $obj = new stdClass;
-                $obj->url = $entry->getURL() . ($link_to_tip ? '' : '?commit='.$commit_id);
-                $obj->name = $entry->getName();
-                array_push($entries, $obj);
-            }
-            $view->entries = $entries;
+            /* FIXME: ignores current commit_id */
+            $view->entries = $page->listEntries();
         }
         else if ($type == NULL)
         {
