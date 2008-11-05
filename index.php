@@ -327,7 +327,9 @@ else // page-related {{{1
         if ($type == WikiPage::TYPE_TREE)
         {
             /* FIXME: ignores current commit_id */
-            $view->entries = $page->listEntries();
+            $entries = $page->listEntries();
+            usort($entries, create_function('$a, $b', 'return call_user_func(Config::TREE_VIEW_SORT, $a->getName(), $b->getName());'));
+            $view->entries = $entries;
         }
         else if ($type == NULL)
         {

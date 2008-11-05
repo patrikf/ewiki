@@ -52,5 +52,8 @@ final class Config
 
     // Treat empty files as non-existent
     const IGNORE_EMPTY_PAGES = false;
+
+    // How to sort pages in tree view (comparison callback)
+    const TREE_VIEW_SORT = 'strnatcmp';
 }
 
