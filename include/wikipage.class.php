@@ -163,7 +163,7 @@ class WikiPage
 
     public function isValid()
     {
-        return ($this->object && (!Config::IGNORE_EMPTY_PAGES || !empty($this->object->data)));
+        return ($this->object && ($this->object instanceof GitTree || !Config::IGNORE_EMPTY_PAGES || !empty($this->object->data)));
     }
 }
 
