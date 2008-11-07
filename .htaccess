@@ -1,7 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php
+</IfModule>
 
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ index.php
-
-php_flag magic_quotes_gpc off
-
+<IfModule mod_php5.c>
+    php_flag magic_quotes_gpc off
+    php_flag magic_quotes_runtime off
+</IfModule>
