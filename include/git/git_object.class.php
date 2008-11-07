@@ -22,13 +22,7 @@ class GitObject
 
     protected function hash($data)
     {
-	$hash = hash_init('sha1');
-	hash_update($hash, Git::getTypeName($this->type));
-	hash_update($hash, ' ');
-	hash_update($hash, strlen($data));
-	hash_update($hash, "\0");
-	hash_update($hash, $data);
-	return hash_final($hash, TRUE);
+        return Git::hash_object($this->type, $data);
     }
 
     public function __construct($repo, $type)

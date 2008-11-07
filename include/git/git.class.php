@@ -20,6 +20,9 @@ class Git
 {
     public $dir;
 
+    protected $raw_object_cache = array();
+    /* FIXME allow limiting the cache to a certain size */
+
     const OBJ_NONE = 0;
     const OBJ_COMMIT = 1;
     const OBJ_TREE = 2;
@@ -63,6 +66,17 @@ class Git
 	while (($entry = readdir($dh)) !== FALSE)
 	    if (preg_match('#^pack-([0-9a-fA-F]{40})\.idx$#', $entry, $m))
 		array_push($this->packs, sha1_bin($m[1]));
+    }
+
+    static public function hash_object($type, $data)
+    {
+	$hash = hash_init('sha1');
+	hash_update($hash, Git::getTypeName($type));
+	hash_update($hash, ' ');
+	hash_update($hash, strlen($data));
+	hash_update($hash, "\0");
+	hash_update($hash, $data);
+	return hash_final($hash, TRUE);
     }
 
     /**
@@ -241,7 +255,10 @@ class Git
         else
             throw new Exception(sprintf('object of unknown type %d', $type));
 
-        return array($type, $data);
+        $hash = Git::hash_object($type, $data);
+        $r = array($type, $data);
+        $this->raw_object_cache[$hash] = $r;
+        return $r;
     }
 
     /**
@@ -254,11 +271,9 @@ class Git
      */
     protected function getRawObject($object_name)
     {
-        static $cache = array();
-        /* FIXME allow limiting the cache to a certain size */
+        if (isset($this->raw_object_cache[$object_name]))
+            return $this->raw_object_cache[$object_name];
 
-        if (isset($cache[$object_name]))
-            return $cache[$object_name];
 	$sha1 = sha1_hex($object_name);
 	$path = sprintf('%s/objects/%s/%s', $this->dir, substr($sha1, 0, 2), substr($sha1, 2));
 	if (file_exists($path))
@@ -287,7 +302,7 @@ class Git
 	}
         else
             throw new Exception(sprintf('object not found: %s', sha1_hex($object_name)));
-        $cache[$object_name] = $r;
+
         return $r;
     }
 
@@ -299,10 +314,16 @@ class Git
      */
     public function getObject($name)
     {
+        static $cache = array();
+        if (isset($cache[$name]))
+            return $cache[$name];
+
 	list($type, $data) = $this->getRawObject($name);
 	$object = GitObject::create($this, $type);
 	$object->unserialize($data);
 	assert($name == $object->getName());
+
+        $cache[$name] = $object;
 	return $object;
     }
 
