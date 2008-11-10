@@ -55,5 +55,5 @@ final class Config
 
     // How to sort pages in tree view (comparison callback)
     const TREE_VIEW_SORT = 'strnatcmp';
-}
-
+};
+?>

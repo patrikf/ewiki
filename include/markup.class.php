@@ -239,5 +239,5 @@ class Markup
         Markup::parse(&$in, &$out, NULL);
         return $out;
     }
-}
-
+};
+?>

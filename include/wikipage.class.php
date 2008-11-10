@@ -165,5 +165,5 @@ class WikiPage
     {
         return ($this->object && ($this->object instanceof GitTree || !Config::IGNORE_EMPTY_PAGES || !empty($this->object->data)));
     }
-}
-
+};
+?>
