@@ -21,7 +21,7 @@ body
     margin: auto;
     padding: 0px 20px 5px;
 }
-
+/* header {{{1 */
 #pagetitle
 {
     margin-top: .25em;
@@ -60,7 +60,7 @@ body
 {
     color: #AAA;
 }
-
+/* page body {{{1 */
 p,
 div.par
 {
@@ -123,12 +123,12 @@ table th { font-weight: bold; }
 
 em { font-style: italic; }
 strong { font-weight: bold; }
-
+/* history {{{1 */
 table.history
 {
     font-size: .8em;
 }
-
+/* forms {{{1 */
 #edit-form textarea,
 .view-source textarea
 {
@@ -159,7 +159,7 @@ input.submit
 {
     margin: .75em 0px .75em .5em;
 }
-
+/* various {{{1 */
 .hidden
 {
     display: none;
@@ -216,4 +216,5 @@ div.preview
     padding-bottom: 3em;
     border-bottom: 3px solid #000;
 }
-
+/* }}}1 */
+/* vim:set fdm=marker fmr={{{,}}}: */
