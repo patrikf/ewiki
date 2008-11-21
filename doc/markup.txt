@@ -1,0 +1,83 @@
+Markup Language for eWiki
+=========================
+
+Pages are split into paragraphs, which are separated by one or more lines
+containing nothing or just whitespace (like TeX).
+
+        First
+        paragraph
+
+        Second paragraph
+
+Headings
+--------
+Headings are denoted by lines starting with two or more equal signs (==). The
+number of equal signs defines the level of the heading. At least three levels
+(==, ===, ====) must be supported.
+
+Lists
+-----
+If an asterisk (*) appears at the beginning of a paragraph, the paragraph is
+treated as a list. Every line beginning with whitespace (optional) and an
+asterisk starts a new item. Use multiple asterisks for nested lists (like
+Textile).
+
+        * first
+        item * still first item
+        * second item
+        ** subitem
+
+Tables
+------
+Paragraphs with a pipe (|) at their beginning start a table. Every subsequent
+pipe starts a new cell; a pipe at the beginning of a line starts a new row. |=
+instead of | denotes a cell heading.
+
+        |= Name |= Age |
+        third cell in first row
+        | Paul | 32
+        | Linda | 18
+
+Specials
+--------
+Lines starting with a hash sign (#) are treated specially. If it is
+followed by whitespace, the whole line shall be ignored. Text directly after
+the hash sign is subject to implementation-defined behaviour.
+
+        # this is a comment
+        #image coffee.png@640x480
+
+In-text markup
+-------------------
+Within plain paragraphs, lists and tables, text can be formatted as follows
+(like MediaWiki):
+
+''foo''      emphasis (<emph>, usually italic)
+'''foo'''    more emphasis (<strong>, usually bold)
+
+Links are enclosed in double square brackets. A pipe separates the link target
+from the optional label. The target may either be an URL or a
+implementation-defined target (e.g. wiki links). If no link label is given,
+one is chosen automatically (usually the given URL resp. the name of the wiki
+page).
+
+        [[http://google.com|Google]]  external link with label
+        [[Some page]]                 local link (e.g. wiki page)
+        [[wp:Main page]]              implementation-dependent, maybe a link
+                                      to Wikipedia's "Main page"
+
+Escaping
+--------
+The backslash (\) serves a special purpose: it can be used to escape any of
+the formatting sequences specified here, including itself (\\).
+
+The sequence \!C begins an escaped block. Within this block, all formatting
+characters except \ lose their meaning. C is an arbitrary character that
+begins and ends such a block (like Perl regexps). If C is an opening bracket
+(round, square or curly), its closing variant ends the block instead.
+
+Any other sequences starting with \, but not escaping a formatting sequence,
+can be used to provide further shortcuts (like TeX).
+
+
+vim:set tw=78 fo=tcq:
