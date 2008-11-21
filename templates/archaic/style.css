@@ -11,7 +11,7 @@ body
     font-size: 13px;
 }
 
-#page
+@media screen { #page
 {
     border-width: 0px 1px 1px;
     border-color: #AAA;
@@ -20,7 +20,7 @@ body
     width: 50em;
     margin: auto;
     padding: 0px 20px 5px;
-}
+}}
 /* header {{{1 */
 #pagetitle
 {
@@ -215,6 +215,32 @@ div.preview
 {
     padding-bottom: 3em;
     border-bottom: 3px solid #000;
+}
+/* print rules {{{1 */
+@media print
+{
+    body
+    {
+        font-size: 10pt;
+        background-color: #FFF;
+    }
+
+    p
+    {
+        font-family: Palatino, "URW Palladio L", "Palatino Linotype", Garamond, serif;
+        font-size: 10pt;
+    }
+
+    #linkpane
+    {
+        display: none;
+    }
+
+    h1, h2, h3
+    {
+        font-weight: bold;
+        page-break-after: avoid;
+    }
 }
 /* }}}1 */
 /* vim:set fdm=marker fmr={{{,}}}: */
