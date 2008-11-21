@@ -236,6 +236,6 @@ class MIME
         }
         return $is_binary ? 'application/octet-stream' : 'text/plain';
     }
-};
+}
 
 ?>

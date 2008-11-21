@@ -24,6 +24,6 @@ final class Cache
         else
             header('Last-Modified: ' . Cache::httpdate($last_modified));
     }
-};
+}
 
 ?>

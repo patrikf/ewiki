@@ -48,5 +48,6 @@ class View
 	foreach ($vars as $key => $value)
 	    $this->$key = $value;
     }
-};
+}
+
 ?>
