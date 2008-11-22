@@ -110,9 +110,10 @@ abstract class eMarkup
         $r = '';
         while ($a < strlen($in))
         {
-            if (!preg_match("/ ( ''' | '' | \[\[ | ]] | \\\ ) /x", $in, $m, PREG_OFFSET_CAPTURE, $a))
+            if (!preg_match("/ ( ''' | '' | \[\[ | ]] | \| | \\\ ) /x", $in, $m, PREG_OFFSET_CAPTURE, $a))
             {
                 $r .= $this->fmt_plain(substr($in, $a));
+                $a = strlen($in);
                 break;
             }
             list($match, $b) = $m[1];
@@ -155,6 +156,11 @@ abstract class eMarkup
                 if ($ctx == 'link_label')
                     return $r;
             }
+            else if ($match == '|')
+            {
+                if ($ctx == 'cell')
+                    return $r;
+            }
             /* pass-through for control sequence */
             $r .= $this->fmt_plain($match);
             continue;
@@ -189,14 +195,41 @@ abstract class eMarkup
         return $items;
     }
 
-    protected function parse_block($in)
+    protected function parse_table_row($in, &$a=0) // {{{1
+    {
+        $cells = array();
+        while ($a < strlen($in))
+        {
+            $ishead = FALSE;
+            if ($in{$a} == '=')
+            {
+                $ishead = TRUE;
+                $a++;
+            }
+            $cell = $this->parse_par($in, $a, 'cell');
+            if ($ishead)
+                $cell = $this->fmt_cell_head($cell);
+            else
+                $cell = $this->fmt_cell($cell);
+            array_push($cells, $cell);
+        }
+        return $this->fmt_row($cells);
+    }
+
+    protected function parse_table($in) // {{{1
+    {
+        $rows = explode("\n|", substr($in, 1));
+        return $this->fmt_table(array_map(array($this, 'parse_table_row'), $rows));
+    }
+
+    protected function parse_block($in) // {{{1
     {
         if (empty($in))
             return NULL;
         if ($in{0} == '*')
             return $this->fmt_list($this->parse_list($in));
         if ($in{0} == '|')
-            return $this->fmt_par('[table]');
+            return $this->parse_table($in);
         if ($in{0} == '#')
             return $this->parse_special($in);
         /* heading */
