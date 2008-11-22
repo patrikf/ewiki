@@ -29,27 +29,35 @@ abstract class eMarkup
     }
 
     // Parsing bits prototypes {{{1
-    /*
-     * Note that fmt_plain() is the only function that gets unchecked input.
-     * If necessary, it should convert successive whitespace into single
-     * spaces and escape input.
-     */
-             protected function fmt_page($blocks) { return implode('', $blocks); }
+             protected function fmt_page($blocks)
+                       { return implode('', $blocks); }
     abstract protected function fmt_par($s);
     abstract protected function fmt_heading($level, $s);
     abstract protected function fmt_list($items);
     abstract protected function fmt_listitem($s);
-             protected function fmt_sublist($items) { return $this->fmt_list($items); }
+             protected function fmt_sublist($items)
+                       { return $this->fmt_list($items); }
     abstract protected function fmt_table($rows);
     abstract protected function fmt_row($cells);
     abstract protected function fmt_cell($s);
-             protected function fmt_cell_head($s) { return $this->fmt_cell($s); }
-             protected function fmt_comment($s) { return ''; }
+             protected function fmt_cell_head($s)
+                       { return $this->fmt_cell($s); }
+             protected function fmt_comment($s)
+                       { return ''; }
     abstract protected function fmt_emph($s);
     abstract protected function fmt_strong($s);
     /* Auto-generated vs. user-provided label */
-             protected function fmt_link($url, $label) { return $this->fmt_labeled_link($url, $label); }
-    abstract protected function fmt_labeled_link($url, $user_label);
+             protected function fmt_link($ref, $label)
+                       { return $this->fmt_labeled_link($ref, $label); }
+    abstract protected function fmt_labeled_link($ref, $user_label);
+             protected function fmt_error($s)
+                       { return $this->fmt_plain('[ERROR] '.$s); }
+             protected function fmt_image($ref, $width, $height)
+                       { return $this->fmt_plain('[IMAGE: '.$ref.']'); }
+    /*
+     * fmt_plain() gets unchecked user input. If necessary, it should perform
+     * whitespace conversion and escaping of special characters.
+     */
              protected function fmt_plain($s) { return $s; }
 
     static protected function comment_filter($line) // {{{1
@@ -57,9 +65,25 @@ abstract class eMarkup
         return $line != '#' && (strlen($line) < 2 || $line{0} != '#' || !ctype_space($line{1}));
     }
 
+    protected function error($s) // {{{1
+    {
+        return $this->fmt_error($this->fmt_plain($s));
+    }
+
     protected function parse_special($in) // {{{1
     {
-        return array();
+        $x = preg_split('/\\s+/', substr($in, 1), 2);
+        $special = $x[0];
+        $args = isset($x[1]) ? $x[1] : '';
+
+        if ($special == 'image')
+        {
+            if (!preg_match('/^ (.+?) (?: @ (\d+)? x (\d+)? )? $/x', $args, $m))
+                return $this->error('Syntax error: '.$in);
+            return $this->fmt_image($m[1], empty($m[2]) ? NULL : intval($m[2]), empty($m[3]) ? NULL : intval($m[3]));
+        }
+        else
+            return $this->error('Unknown special: '.$in);
     }
 
     protected function mklink($target, $label=NULL) // {{{1
@@ -231,7 +255,7 @@ abstract class eMarkup
         if ($in{0} == '|')
             return $this->parse_table($in);
         if ($in{0} == '#')
-            return $this->parse_special($in);
+            return $this->parse_special(trim($in));
         /* heading */
         if (preg_match('/^ (={2,}) \s* (.+?) =* $/xm', $in, $m))
         {

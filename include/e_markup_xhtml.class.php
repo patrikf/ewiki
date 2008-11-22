@@ -18,7 +18,32 @@ class eMarkupXHTML extends eMarkup
     protected function fmt_labeled_link($url, $label, $new=FALSE)
                                         { return sprintf('<a href="%s" class="%s">%s</a>', $url, $new?'new':'', $label); }
 
+    protected function fmt_plain($s)    { return Markup::escape($s); }
+    protected function fmt_error($s)    { return sprintf('<div class="error">%s</div>', $s); }
+
     /* specific to eWiki */
+    protected function fmt_image($ref, $width, $height)
+    {
+        if (!$width && !$height)
+        {
+            $width = Config::IMAGE_WIDTH;
+            $height = Config::IMAGE_HEIGHT;
+        }
+        try
+        {
+            $page = new WikiPage($ref);
+        }
+        catch (Exception $e)
+        {
+            return $this->fmt_error('No such file: '.$this->mklink($ref));
+        }
+        if ($page->getPageType() != WikiPage::TYPE_IMAGE)
+            return $this->fmt_error('Not an image: '.$this->mklink($ref));
+
+        $url = $page->getURL();
+        return "<div class=\"par image\"><a href=\"$url\"><img src=\"$url?action=image&amp;width=$width&amp;height=$height\" alt=\"{$page->getName()}\" /></a></div>";
+    }
+
     protected function mklink($ref, $label=NULL)
     {
         list($url, $label2, $valid) = Markup::parseLinkTarget($ref);
