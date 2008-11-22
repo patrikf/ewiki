@@ -216,8 +216,32 @@ abstract class eMarkup
         $lines = explode("\n", $in);
         $lines = array_map('trim', $lines);
         $lines = array_filter($lines, array('eMarkup', 'comment_filter'));
-        $lines = implode("\n", $lines);
-        $blocks = preg_split(';\n{2,};', $lines);
+
+        $blocks = array();
+        $block = '';
+        $cur = '';
+        foreach ($lines as $line)
+        {
+            if (empty($line))
+            {
+                if (!empty($block))
+                    array_push($blocks, $block);
+                $block = '';
+                $cur = '';
+                continue;
+            }
+            else if ($cur != $line{0} && ($line{0} == '#' || $line{0} == '|' || $line{0} == '*'))
+            {
+                if (!empty($block))
+                    array_push($blocks, $block);
+                $block = '';
+                $cur = $line{0};
+            }
+            $block .= $line."\n";
+        }
+        if (!empty($block))
+            array_push($blocks, $block);
+
         $blocks = array_map(array($this, 'parse_block'), $blocks);
         $blocks = array_flatten($blocks);
         return $this->fmt_page($blocks);
