@@ -28,8 +28,8 @@ abstract class eMarkup
         $this->content = $content;
     }
 
+    // Parsing bits prototypes {{{1
     /*
-     * Parsing bits prototypes.
      * Note that fmt_plain() is the only function that gets unchecked input.
      * If necessary, it should convert successive whitespace into single
      * spaces and escape input.
@@ -52,17 +52,17 @@ abstract class eMarkup
     abstract protected function fmt_labeled_link($url, $user_label);
              protected function fmt_plain($s) { return $s; }
 
-    static protected function comment_filter($line)
+    static protected function comment_filter($line) // {{{1
     {
         return $line != '#' && (strlen($line) < 2 || $line{0} != '#' || !ctype_space($line{1}));
     }
 
-    protected function parse_special($in)
+    protected function parse_special($in) // {{{1
     {
         return array();
     }
 
-    protected function mklink($target, $label=NULL)
+    protected function mklink($target, $label=NULL) // {{{1
     {
         if ($label === NULL)
             return $this->fmt_link($target, $target);
@@ -70,7 +70,7 @@ abstract class eMarkup
             return $this->fmt_labeled_link($target, $label);
     }
 
-    protected function parse_link($in, &$a=0)
+    protected function parse_link($in, &$a=0) // {{{1
     {
         $target = '';
         while ($a < strlen($in))
@@ -105,7 +105,7 @@ abstract class eMarkup
         return $this->mklink($target);
     }
 
-    protected function parse_par($in, &$a=0, $ctx='par')
+    protected function parse_par($in, &$a=0, $ctx='par') // {{{1
     {
         $r = '';
         while ($a < strlen($in))
@@ -162,7 +162,7 @@ abstract class eMarkup
         return $r;
     }
 
-    protected function parse_list($in)
+    protected function parse_list($in) // {{{1
     {
         $in = explode("\n*", substr($in, 1));
         $items = array();
@@ -211,7 +211,7 @@ abstract class eMarkup
         return $this->fmt_par($this->parse_par($in));
     }
 
-    protected function parse_page($in)
+    protected function parse_page($in) // {{{1
     {
         $lines = explode("\n", $in);
         $lines = array_map('trim', $lines);
@@ -247,10 +247,11 @@ abstract class eMarkup
         return $this->fmt_page($blocks);
     }
 
-    public function format()
+    public function format() // {{{1
     {
         return $this->parse_page($this->content);
     }
+    // }}}1
 }
 
 // vim:set fdm=marker fmr={{{,}}}:
