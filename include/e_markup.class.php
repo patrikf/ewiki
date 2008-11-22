@@ -257,14 +257,8 @@ abstract class eMarkup
         if ($in{0} == '#')
             return $this->parse_special(trim($in));
         /* heading */
-        if (preg_match('/^ (={2,}) \s* (.+?) =* $/xm', $in, $m))
-        {
-            $r = array($this->fmt_heading(strlen($m[1])-1, $this->parse_par($m[2])));
-            $pos = strpos($in, "\n");
-            if ($pos !== FALSE)
-                array_push($r, $this->parse_block(substr($in, $pos+1)));
-            return $r;
-        }
+        if (preg_match('/^ (={2,}) \s* (.+?) =* (?:\s|\n)* $/x', $in, $m))
+            return $this->fmt_heading(strlen($m[1])-1, $this->parse_par($m[2]));
         return $this->fmt_par($this->parse_par($in));
     }
 
@@ -287,7 +281,9 @@ abstract class eMarkup
                 $cur = '';
                 continue;
             }
-            else if ($cur != $line{0} && ($line{0} == '#' || $line{0} == '|' || $line{0} == '*'))
+            else if (($line{0} == '=' || $cur == '=') /* "=" starts new block and lasts only 1 line */
+                  || ($cur != $line{0} /* one of "#|*" in a block of different type starts a new block */
+                   && ($line{0} == '#' || $line{0} == '|' || $line{0} == '*')))
             {
                 if (!empty($block))
                     array_push($blocks, $block);
