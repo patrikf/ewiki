@@ -57,6 +57,11 @@ abstract class eMarkup
         return $line != '#' && (strlen($line) < 2 || $line{0} != '#' || !ctype_space($line{1}));
     }
 
+    protected function parse_special($in)
+    {
+        return array();
+    }
+
     protected function mklink($target, $label=NULL)
     {
         if ($label === NULL)
@@ -192,6 +197,8 @@ abstract class eMarkup
             return $this->fmt_list($this->parse_list($in));
         if ($in{0} == '|')
             return $this->fmt_par('[table]');
+        if ($in{0} == '#')
+            return $this->parse_special($in);
         /* heading */
         if (preg_match('/^ (={2,}) \s* (.+?) =* $/xm', $in, $m))
         {
