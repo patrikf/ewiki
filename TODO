@@ -1,9 +1,7 @@
 == less important
 * server-side caching?
-* client-side caching?
+* improve client-side caching
 * support for diffs
-* revamped markup
-* support for inline images?
 * support for viewing commit details, author details
 * JavaScript XHR preview
 
