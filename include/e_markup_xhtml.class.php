@@ -16,7 +16,7 @@ class eMarkupXHTML extends eMarkup
     protected function fmt_emph($s)     { return sprintf('<emph>%s</emph>', $s); }
     protected function fmt_strong($s)   { return sprintf('<strong>%s</strong>', $s); }
     protected function fmt_labeled_link($url, $label, $new=FALSE)
-                                        { return sprintf('<a href="%s" class="%s">%s</a>', $url, $new?'new':'', $label); }
+                                        { return sprintf('<a href="%s" %s>%s</a>', $url, $new?'class="new"':'', $label); }
 
     protected function fmt_plain($s)    { return Markup::escape($s); }
     protected function fmt_error($s)    { return sprintf('<div class="error">%s</div>', $s); }
