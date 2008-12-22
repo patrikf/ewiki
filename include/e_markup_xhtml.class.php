@@ -13,7 +13,7 @@ class eMarkupXHTML extends eMarkup
     protected function fmt_row($cells)  { return sprintf('<tr>%s</tr>', join('', $cells)); }
     protected function fmt_cell($s)     { return sprintf('<td>%s</td>', $s); }
     protected function fmt_cell_head($s){ return sprintf('<th>%s</th>', $s); }
-    protected function fmt_emph($s)     { return sprintf('<emph>%s</emph>', $s); }
+    protected function fmt_emph($s)     { return sprintf('<em>%s</em>', $s); }
     protected function fmt_strong($s)   { return sprintf('<strong>%s</strong>', $s); }
     protected function fmt_labeled_link($url, $label, $new=FALSE)
                                         { return sprintf('<a href="%s"%s>%s</a>', $url, $new?' class="new"':'', $label); }
