@@ -566,7 +566,7 @@ else // page-related {{{1
 
         if (isset($_GET['width']) || isset($_GET['height']))
         {
-            // Resize (oh god why does php not have a simple image_resize function?)
+            // Resize (why on earth does php not have a simple image_resize function?)
             $old_image = imagecreatefromstring($page->object->data);
             $old_size = array(imagesx($old_image), imagesy($old_image));
             $new_size = array(isset($_GET['width'])  ? (int)$_GET['width']  : 0,
