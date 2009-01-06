@@ -182,11 +182,20 @@ div.commits .commit
 {
     margin: .75em 0px;
     line-height: 1.2;
+    background-color: #FAFAFA;
+    border: 1px solid #EEE;
+    padding: .5em;
+}
+
+div.commits .commit .author
+{
+    font-size: .8em;
 }
 
 div.commits .commit .summary
 {
-    font-weight: bold;
+    font-size: 1.2em;
+    line-height: 1.5;
 }
 
 div.commits .commit .changes
