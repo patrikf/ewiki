@@ -113,17 +113,22 @@ $view->n_conflicts = count(ls_r(sprintf('%s/refs/heads/%s', Config::GIT_PATH, Co
 $special = $page = NULL;
 if (!strncmp($parts[0], '/:', 2))
     $special = explode('/', substr($parts[0], 2), 2);
-else
+if ($special === NULL)
 {
     $action = isset($_GET['action']) ? $_GET['action'] : '';
     if ($action == '')
         $action = 'view';
-    $view->action = $action;
 
     $page = WikiPage::fromURL($parts[0], $commit);
-    $view->page = $page;
 }
 // }}}1
+
+if ($special[0] == 'index')
+{
+    $action = 'view';
+    $page = new WikiPage(array(), $commit);
+    $special = NULL;
+}
 
 if ((Config::REQUIRE_LOGIN && !$user) || (Config::AUTHENTICATION && $special[0] == 'login')) // {{{1
 {
@@ -313,10 +318,10 @@ else if ($special[0] == 'logout') // {{{1
     setcookie('session', '', 1, Config::PATH . '/');
     redirect(Config::PATH . '/');
 }
-else if ($special !== NULL) // {{{1
-    throw new Exception(sprintf('unknown special: %s', $special[0]));
-else // page-related {{{1
+else if ($special === NULL) // page-related {{{1
 {
+    $view->action = $action;
+    $view->page = $page;
     if ($action == 'view') // {{{2
     {
         $view->setTemplate('page-view.php');
@@ -622,6 +627,8 @@ else // page-related {{{1
         throw new Exception(sprintf('unhandled action: %s', $action));
     // }}}2
 }
+else if ($special !== NULL) // {{{1
+    throw new Exception(sprintf('unknown special: %s', $special[0]));
 // }}}1
 
 /* vim:set fdm=marker fmr={{{,}}}: */
