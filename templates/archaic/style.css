@@ -81,6 +81,11 @@ ul li
     margin: .2em 0px;
 }
 
+ul ul
+{
+    margin: .2em 0px .5em .5em;
+}
+
 a
 {
     color: #02A;
