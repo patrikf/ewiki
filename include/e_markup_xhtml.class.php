@@ -7,8 +7,25 @@ class eMarkupXHTML extends eMarkup
     protected function fmt_par($s)      { return sprintf('<p>%s</p>', $s); }
     protected function fmt_heading($level, $s)
                                         { return sprintf('<h%d>%s</h%1$d>', $level+1, $s); }
-    protected function fmt_list($items) { return sprintf('<ul>%s</ul>', join('', $items)); }
-    protected function fmt_listitem($s) { return sprintf('<li>%s</li>', $s); }
+    protected function fmt_list($items)
+    {
+        $s = '<ul><li>';
+        $first = TRUE;
+        foreach ($items as $item)
+        {
+            if ($item[0] && !$first)
+                $s .= '</li><li>';
+            $s .= $item[1];
+            $first = FALSE;
+        }
+        $s .= '</li></ul>';
+        return $s;
+    }
+    protected function fmt_sublist($items)
+    {
+        return array(0, $this->fmt_list($items));
+    }
+    protected function fmt_listitem($s) { return array(1, $s); }
     protected function fmt_table($rows) { return sprintf('<table>%s</table>', join('', $rows)); }
     protected function fmt_row($cells)  { return sprintf('<tr>%s</tr>', join('', $cells)); }
     protected function fmt_cell($s)     { return sprintf('<td>%s</td>', $s); }
