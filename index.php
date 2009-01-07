@@ -176,7 +176,7 @@ else if ($special[0] == 'recent') // {{{1
 
         $commits[$i] = new stdClass;
         $commits[$i]->commit_id = sha1_hex($cur->getName());
-        $commits[$i]->author = $commit->author->name;
+        $commits[$i]->author = $cur->author->name;
         $commits[$i]->summary = $cur->summary;
         $commits[$i]->detail = $cur->detail;
 
