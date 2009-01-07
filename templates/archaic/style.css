@@ -178,7 +178,7 @@ input.submit
     top: -.1em;
 }
 
-div.commits .commit
+div.commits .commit, div.searchresults .result
 {
     margin: .75em 0px;
     line-height: 1.2;
@@ -192,7 +192,7 @@ div.commits .commit .author
     font-size: .8em;
 }
 
-div.commits .commit .summary
+div.commits .commit .summary, div.searchresults .result .page
 {
     font-size: 1.2em;
     line-height: 1.5;
@@ -229,6 +229,16 @@ div.preview
 {
     padding-bottom: 3em;
     border-bottom: 3px solid #000;
+}
+
+div.searchresults div.match
+{
+    padding: .2em 0px;
+}
+
+span.before-match, span.after-match
+{
+    color: #777;
 }
 /* print rules {{{1 */
 @media print

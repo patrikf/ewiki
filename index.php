@@ -66,6 +66,18 @@ function edit_preview($content) // {{{2
     $view->contents = Markup::format($content);
     return $view->display(TRUE);
 }
+function search_normalize($str) // {{{2
+{
+    $str = strtolower($str);
+
+    /* an effort to create better search results */
+    $str = preg_replace('/[^a-z]+/', ' ', $str);
+
+//    $str = preg_replace('/\s+/', ' ', $str);
+    $str = trim($str);
+
+    return $str;
+}
 // }}}1
 
 $view = new View;
@@ -275,6 +287,67 @@ else if ($special[0] == 'merge') // {{{1
     $view->A = $A;
     $view->B = $B;
     $view->fresh = isset($_GET['fresh']);
+
+    $view->display();
+}
+else if ($special[0] == 'find') // {{{1
+{
+    $view->setTemplate('search-results.php');
+
+    $query = NULL;
+    if (!$query && isset($_POST['q']))
+        $query = $_POST['q'];
+    if (!$query && isset($_GET['q']))
+        $query = $_GET['q'];
+    if (!$query && isset($special[1]))
+        $query = $special[1];
+    $query = search_normalize($query);
+    if (!$query)
+        throw new Exception('no search term given');
+    if (strlen($query) < 4)
+        throw new Exception('please narrow your search');
+
+    $view->query = $query;
+
+    $blobs = $commit->getTree()->listRecursive();
+    $results = array();
+    foreach ($blobs as $path => $blob)
+    {
+        $data = $repo->getObject($blob)->data;
+        $data = search_normalize($data);
+
+        $result = new stdClass;
+        $result->matches = array();
+
+        for ($pos = 0; ($pos = strpos($data, $query, $pos)) !== FALSE; $pos++)
+        {
+            $match = new stdClass;
+            $env = 20;
+            $env_from = max(0, $pos - $env);
+            $match->env = array(
+                    ($env_from == 0 ? '' : '... ') . substr($data, $env_from, $pos - $env_from),
+                    $query,
+                    substr($data, $pos+strlen($query), $env) . ($pos+strlen($query)+$env >= strlen($data) ? '' : ' ...')
+                );
+            array_push($result->matches, $match);
+        }
+
+        $hasmatch = count($result->matches) > 0;
+
+        $path_s = search_normalize($path);
+        if (($pos = strpos($path_s, $query)) !== FALSE)
+            $hasmatch = TRUE;
+
+        if ($hasmatch)
+        {
+            $result->page = new WikiPage($path);
+
+            array_push($results, $result);
+        }
+
+    }
+
+    $view->results = $results;
 
     $view->display();
 }
