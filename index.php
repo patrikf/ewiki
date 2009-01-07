@@ -147,8 +147,10 @@ if ((Config::REQUIRE_LOGIN && !$user) || (Config::AUTHENTICATION && $special[0] 
     $view->setTemplate('login.php');
 
     $goto = $parts;
-    if ($special)
+    if ($special && $special[0] == 'login')
         $goto[0] = '/'.$special[1];
+    else if ($special)
+        $goto[0] = '/:'.implode('/', $special);
     $goto = implode('?', $goto);
     $view->goto = $goto;
     $view->wrong = FALSE;
