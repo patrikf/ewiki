@@ -25,5 +25,28 @@ window.addEvent('domready', function ()
 {
     $$('.form-opt').addEvent('change', check_opts);
     check_opts();
+
+    s = $$('#searchbox input');
+    s_default = 'search (beta)';
+    s.each(function (el)
+    {
+        el.inactive = (el.value == s_default);
+        el.setClass('inactive', el.inactive);
+    });
+    s.addEvent('focus', function (event)
+    {
+        el = $(event.target);
+        el.setClass('inactive', false);
+        if (el.inactive)
+            el.value = '';
+    });
+    s.addEvent('blur', function (event)
+    {
+        el = $(event.target);
+        el.inactive = (el.value == '');
+        el.setClass('inactive', el.inactive);
+        if (el.inactive)
+            el.value = s_default;
+    });
 });
 

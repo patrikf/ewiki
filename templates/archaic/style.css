@@ -60,6 +60,29 @@ body
 {
     color: #AAA;
 }
+
+#searchbox
+{
+    text-align: right;
+}
+
+#searchbox input
+{
+    width: 30%;
+    margin: .2em 0px 0px;
+    border: 1px dotted #000;
+}
+
+#searchbox input.inactive
+{
+    color: #AAA;
+    border-color: #AAA;
+}
+
+#searchbox input:focus
+{
+    border-style: solid;
+}
 /* page body {{{1 */
 p,
 div.par

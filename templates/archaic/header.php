@@ -45,5 +45,10 @@
         </div>
     <? endif; ?>
     <div style="clear: both"></div>
+    <div id="searchbox">
+        <form method="post" action="/:find">
+            <input name="q" class="text" value="search (beta)" />
+        </form>
+    </div>
     <? endif; ?>
 </div>
