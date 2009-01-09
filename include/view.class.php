@@ -23,7 +23,7 @@ class View
     public function display($capture=false)
     {
         $include_path = get_include_path();
-        set_include_path('templates/' . Config::TEMPLATE);
+        set_include_path('templates' . DIRECTORY_SEPARATOR . Config::TEMPLATE . PATH_SEPARATOR . 'templates');
 
 	ob_start();
 	$this->run();
