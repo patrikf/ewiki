@@ -178,14 +178,18 @@ if ((Config::REQUIRE_LOGIN && !$user) || (Config::AUTHENTICATION && $special[0] 
 
     $view->display();
 }
-else if ($special[0] == 'recent') // {{{1
+else if ($special[0] == 'recent' || $special[0] == "rss20") // {{{1
 {
-    $view->setTemplate('recent-changes.php');
+    if ($special[0] == "rss20")
+        $view->setTemplate('rss20.php');
+    else
+        $view->setTemplate('recent-changes.php');
 
     $maxentries = 15;
     if (isset($special[1]))
         $maxentries = intval($special[1]);
     $maxentries = min(100, $maxentries);
+    $view->maxentries = $maxentries;
 
     $commits = array();
     $history = array_reverse($commit->getHistory());
@@ -196,6 +200,7 @@ else if ($special[0] == 'recent') // {{{1
         $commits[$i] = new stdClass;
         $commits[$i]->commit_id = sha1_hex($cur->getName());
         $commits[$i]->author = $cur->author->name;
+        $commits[$i]->email = $cur->author->email;
         $commits[$i]->time = $cur->committer->time;
         $commits[$i]->summary = $cur->summary;
         $commits[$i]->detail = $cur->detail;

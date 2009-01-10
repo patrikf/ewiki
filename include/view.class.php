@@ -23,7 +23,11 @@ class View
     public function display($capture=false)
     {
         $include_path = get_include_path();
-        set_include_path('templates/' . Config::TEMPLATE);
+        $template_path = array(
+                'templates/'.Config::TEMPLATE,
+                'templates/common'
+            );
+        set_include_path(implode(PATH_SEPARATOR, $template_path));
 
 	ob_start();
 	$this->run();
