@@ -185,7 +185,7 @@ else if ($special[0] == 'recent') // {{{1
     $maxentries = 15;
     if (isset($special[1]))
         $maxentries = intval($special[1]);
-    $maxentries = min(50, $maxentries);
+    $maxentries = min(100, $maxentries);
 
     $commits = array();
     $history = array_reverse($commit->getHistory());
@@ -196,33 +196,43 @@ else if ($special[0] == 'recent') // {{{1
         $commits[$i] = new stdClass;
         $commits[$i]->commit_id = sha1_hex($cur->getName());
         $commits[$i]->author = $cur->author->name;
+        $commits[$i]->time = $cur->committer->time;
         $commits[$i]->summary = $cur->summary;
         $commits[$i]->detail = $cur->detail;
 
-        if ($i+1 < count($history))
-            $prev = $history[$i+1];
-        else
-            $prev = NULL;
-
         $changes = array();
-        foreach (GitCommit::treeDiff($prev, $cur) as $subject => $type)
+
+        if (count($cur->parents) > 1)
         {
-            $change = new stdClass;
-            $change->subject = $subject;
-
-            if ($type == GitTree::TREEDIFF_REMOVED)
-                $change->type = 'removed';
-            else if ($type == GitTree::TREEDIFF_CHANGED)
-                $change->type = 'modified';
-            else if ($type == GitTree::TREEDIFF_ADDED)
-                $change->type = 'added';
-
-            $changes[] = $change;
+            $commits[$i]->merge = array_map('sha1_hex',  $cur->parents);
         }
-        foreach ($changes as $change)
+        else
         {
-            $page = new WikiPage($change->subject);
-            $change->subject_url = $page->getURL();
+            if (count($cur->parents))
+                $prev = $repo->getObject($cur->parents[0]);
+            else
+                $prev = NULL;
+
+            $commits[$i]->merge = array();
+            foreach (GitCommit::treeDiff($prev, $cur) as $subject => $type)
+            {
+                $change = new stdClass;
+                $change->subject = $subject;
+
+                if ($type == GitTree::TREEDIFF_REMOVED)
+                    $change->type = 'removed';
+                else if ($type == GitTree::TREEDIFF_CHANGED)
+                    $change->type = 'modified';
+                else if ($type == GitTree::TREEDIFF_ADDED)
+                    $change->type = 'added';
+
+                $changes[] = $change;
+            }
+            foreach ($changes as $change)
+            {
+                $page = new WikiPage($change->subject);
+                $change->subject_url = $page->getURL();
+            }
         }
         $commits[$i]->changes = $changes;
     }

@@ -210,21 +210,54 @@ div.commits .commit, div.searchresults .result
     padding: .5em;
 }
 
-div.commits .commit .author
+div.commits .commit .author,
+div.commits .commit .sha1,
+div.commits .commit .time
 {
     font-size: .8em;
+    text-align: right;
+    margin-left: 1em;
+}
+
+div.commits .commit .sha1
+{
+    color: #AAA;
 }
 
 div.commits .commit .summary, div.searchresults .result .page
 {
     font-size: 1.2em;
-    line-height: 1.5;
+    line-height: 1.3;
 }
 
 div.commits .commit .changes
 {
     font-family: monospace;
     font-size: .8em;
+}
+
+div.commits .commit table.changes,
+div.commits .commit table.changes td
+{
+    padding: 0px;
+    margin: 0px;
+    vertical-align: top;
+}
+
+div.commits .commit table.changes
+{
+    margin-top: .5em;
+}
+
+div.commits .commit table.changes td.type
+{
+    text-align: right;
+    width: 11ex;
+}
+
+div.commits .commit table.changes td.subject
+{
+    padding-left: 1em;
 }
 
 div.error,
