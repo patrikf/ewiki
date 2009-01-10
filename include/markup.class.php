@@ -4,9 +4,9 @@ require_once('e_markup_xhtml.class.php');
 
 class Markup
 {
-    public static function escape($in, $raw=FALSE)
+    public static function escape($in)
     {
-        return ($raw ? $in : htmlspecialchars($in, ENT_NOQUOTES, 'UTF-8'));
+        return htmlspecialchars($in, ENT_NOQUOTES, 'UTF-8');
     }
 
     public static function parseLinkTarget($ref)
