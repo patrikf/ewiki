@@ -4,8 +4,7 @@
 <h1 id="pagetitle">Recent changes</h1>
 <div class="commits">
 <? foreach ($commits as $commit): ?>
-    <div class="commit">
-        <a name="<?= $commit->commit_id ?>"></a>
+    <div class="commit" id="commit-<?= $commit->commit_id ?>">
         <div style="float: right">
             <div class="sha1"><?= $commit->commit_id ?></div>
             <div class="time"><?= Markup::escape(strftime('%Y-%m-%d %H:%M', $commit->time)) ?></div>

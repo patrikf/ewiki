@@ -9,7 +9,7 @@
         <? foreach ($commits as $commit): ?>
         <item>
             <title><?= Markup::escape($commit->summary) ?></title>
-            <link><?= 'http://' . $_SERVER['SERVER_NAME'] . Config::PATH . '/:recent/' . $maxentries . '#' . $commit->commit_id ?></link>
+            <link><?= 'http://' . $_SERVER['SERVER_NAME'] . Config::PATH . '/:recent/' . $maxentries . '#commit-' . $commit->commit_id ?></link>
             <? if($commit->detail): ?>
                 <description><?= Markup::escape($commit->detail) ?></description>
             <? endif; ?>
