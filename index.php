@@ -182,9 +182,14 @@ else if ($special[0] == 'recent') // {{{1
 {
     $view->setTemplate('recent-changes.php');
 
+    $maxentries = 15;
+    if (isset($special[1]))
+        $maxentries = intval($special[1]);
+    $maxentries = min(50, $maxentries);
+
     $commits = array();
     $history = array_reverse($commit->getHistory());
-    for ($i = 0; $i < min(10, count($history)); $i++)
+    for ($i = 0; $i < min($maxentries, count($history)); $i++)
     {
         $cur = $history[$i];
 
