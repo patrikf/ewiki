@@ -45,10 +45,10 @@
         </div>
     <? endif; ?>
     <div style="clear: both"></div>
-    <div id="searchbox">
-        <form method="post" action="<?= Config::PATH ?>/:find">
+    <form method="post" action="<?= Config::PATH ?>/:find">
+        <div id="searchbox">
             <input name="q" class="text" value="search (beta)" />
-        </form>
-    </div>
+        </div>
+    </form>
     <? endif; ?>
 </div>
