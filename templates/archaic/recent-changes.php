@@ -8,19 +8,27 @@
         <div style="float: right">
             <div class="sha1"><?= $commit->commit_id ?></div>
             <div class="time"><?= Markup::escape(strftime('%Y-%m-%d %H:%M', $commit->time)) ?></div>
-            <div class="author"><?= $commit->author ?></div>
+            <div class="author"><?= Markup::escape($commit->author) ?></div>
         </div>
-        <div class="summary"><?= $commit->summary ?></div>
+        <div class="summary"><?= Markup::escape($commit->summary) ?></div>
         <? if ($commit->detail): ?>
-            <div class="detail"><?= $commit->detail ?></div>
+            <div class="detail"><?= Markup::escape($commit->detail) ?></div>
         <? endif; ?>
         <? if ($commit->changes || count($commit->merge)): ?>
             <table class="changes">
             <? foreach ($commit->merge as $merge): ?>
-                <tr class="change"><td class="type">merged</td><td class="subject"><?= $merge ?></td></tr>
+                <tr class="change">
+                    <td class="type">merged</td>
+                    <td class="subject"><?= Markup::escape($merge) ?></td>
+                </tr>
             <? endforeach; ?>
             <? foreach ($commit->changes as $change): ?>
-                <tr class="change"><td class="type"><?= $change->type ?></td><td class="subject"><a href="<?= $change->subject_url ?>"><?= $change->subject ?></a></td></tr>
+                <tr class="change">
+                    <td class="type"><?= $change->type ?></td>
+                    <td class="subject">
+                        <a href="<?= Markup::escape($change->subject_url) ?>"><?= Markup::escape($change->subject) ?></a>
+                    </td>
+                </tr>
             <? endforeach; ?>
             </table>
         <? endif; ?>
