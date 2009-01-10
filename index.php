@@ -180,7 +180,7 @@ if ((Config::REQUIRE_LOGIN && !$user) || (Config::AUTHENTICATION && $special[0] 
 }
 else if ($special[0] == 'recent' || $special[0] == "rss20") // {{{1
 {
-    if($special[0] == "rss20")
+    if ($special[0] == "rss20")
         $view->setTemplate('recent-changes-rss20.php');
     else
         $view->setTemplate('recent-changes.php');
