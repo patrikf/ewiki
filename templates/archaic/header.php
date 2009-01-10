@@ -15,6 +15,9 @@
 <link rel="alternate" type="application/x-wiki" title="Edit this page!" href="<?= $page->getUrl() ?>?action=edit" />
 <? endif; ?>
 <? endif; ?>
+<? if (isset($recent_changes_feeds)): ?>
+<link rel="alternate" type="application/rss+xml" title="Recent changes (RSS 2.0)" href="<?= Config::PATH ?>/:rss20" />
+<? endif; ?>
 </head>
 <body>
 <div id="page">

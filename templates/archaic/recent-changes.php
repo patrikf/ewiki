@@ -1,4 +1,5 @@
 <? $title = 'Recent changes'; ?>
+<? $recent_changes_feeds = TRUE; ?>
 <? include('header.php'); ?>
 <h1 id="pagetitle">Recent changes</h1>
 <div class="commits">
