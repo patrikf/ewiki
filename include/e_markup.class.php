@@ -8,7 +8,7 @@ function array_flatten($a)
         if (is_array($x))
             $r = array_merge($r, array_flatten($x));
         else
-            array_push($r, $x);
+            $r[] = $x;
     }
     return $r;
 }
@@ -201,7 +201,7 @@ abstract class eMarkup
             /* simple item */
             if ($in[$i]{0} != '*')
             {
-                array_push($items, $this->fmt_listitem($this->parse_par($in[$i])));
+                $items[] = $this->fmt_listitem($this->parse_par($in[$i]));
                 $i++;
                 continue;
             }
@@ -212,7 +212,7 @@ abstract class eMarkup
             $lines = array_slice($in, $i, $j-$i);
             $lines = implode("\n", $lines);
 
-            array_push($items, $this->fmt_sublist($this->parse_list($lines)));
+            $items[] = $this->fmt_sublist($this->parse_list($lines));
 
             $i = $j;
         }
@@ -235,7 +235,7 @@ abstract class eMarkup
                 $cell = $this->fmt_cell_head($cell);
             else
                 $cell = $this->fmt_cell($cell);
-            array_push($cells, $cell);
+            $cells[] = $cell;
         }
         return $this->fmt_row($cells);
     }
@@ -276,7 +276,7 @@ abstract class eMarkup
             if (empty($line))
             {
                 if (!empty($block))
-                    array_push($blocks, $block);
+                    $blocks[] = $block;
                 $block = '';
                 $cur = '';
                 continue;
@@ -286,14 +286,14 @@ abstract class eMarkup
                    && ($line{0} == '#' || $line{0} == '|' || $line{0} == '*')))
             {
                 if (!empty($block))
-                    array_push($blocks, $block);
+                    $blocks[] = $block;
                 $block = '';
                 $cur = $line{0};
             }
             $block .= $line."\n";
         }
         if (!empty($block))
-            array_push($blocks, $block);
+            $blocks[] = $block;
 
         $blocks = array_map(array($this, 'parse_block'), $blocks);
         $blocks = array_flatten($blocks);

@@ -43,9 +43,9 @@ function ls_r($path) // {{{2
                 continue;
             $entry = $dir.$entry;
             if (is_dir($path.'/'.$entry))
-                array_push($dirs, $entry.'/');
+                $dirs[] = $entry.'/';
             else
-                array_push($r, $entry);
+                $r[] = $entry;
         }
         closedir($d);
     }
@@ -212,7 +212,7 @@ else if ($special[0] == 'recent') // {{{1
             else if ($type == GitTree::TREEDIFF_ADDED)
                 $change->type = 'added';
 
-            array_push($changes, $change);
+            $changes[] = $change;
         }
         foreach ($changes as $change)
         {
@@ -240,7 +240,7 @@ else if ($special[0] == 'conflicts') // {{{1
         $obj->branch = sprintf('%s/%s', Config::GIT_CONFLICT_BRANCH_DIR, $name);
         $obj->merge_url = sprintf('%s/:merge/%s', Config::PATH, join('/', array_map('urlencode', explode('/', $obj->branch))));
 
-        array_push($conflicts, $obj);
+        $conflicts[] = $obj;
     }
 
     $view->conflicts = $conflicts;
@@ -331,7 +331,7 @@ else if ($special[0] == 'find') // {{{1
                     $query,
                     substr($data, $pos+strlen($query), $env) . ($pos+strlen($query)+$env >= strlen($data) ? '' : ' ...')
                 );
-            array_push($result->matches, $match);
+            $result->matches[] = $match;
         }
 
         $hasmatch = count($result->matches) > 0;
@@ -344,7 +344,7 @@ else if ($special[0] == 'find') // {{{1
         {
             $result->page = new WikiPage($path);
 
-            array_push($results, $result);
+            $results[] = $result;
         }
 
     }
@@ -455,7 +455,7 @@ else if ($special === NULL) // page-related {{{1
                 $pending = array();
 
                 $blob = new GitBlob($repo);
-                array_push($pending, $blob);
+                $pending[] = $blob;
                 $blob->data = $content;
                 $blob->rehash();
 
@@ -501,7 +501,7 @@ else if ($special === NULL) // page-related {{{1
                 $tree = clone $repo->getObject($commit->tree);
                 $pending = array_merge($pending, $tree->updateNode($page->path, 0100640, $blob->getName()));
                 $tree->rehash();
-                array_push($pending, $tree);
+                $pending[] = $tree;
 
                 $newcommit = new GitCommit($repo);
                 $newcommit->tree = $tree->getName();
@@ -529,7 +529,7 @@ else if ($special === NULL) // page-related {{{1
                 $newcommit->summary = $summary;
                 $newcommit->detail = '';
                 $newcommit->rehash();
-                array_push($pending, $newcommit);
+                $pending[] = $newcommit;
 
                 if ($fast_merge)
                 {
@@ -538,7 +538,7 @@ else if ($special === NULL) // page-related {{{1
                     $tree = clone $repo->getObject($tip->tree);
                     $pending = array_merge($pending, $tree->updateNode($page->path, 0100640, $blob->getName()));
                     $tree->rehash();
-                    array_push($pending, $tree);
+                    $pending[] = $tree;
 
                     $merge_base = $newcommit;
 
@@ -550,7 +550,7 @@ else if ($special === NULL) // page-related {{{1
                     $newcommit->summary = 'Fast merge';
                     $newcommit->detail = '';
                     $newcommit->rehash();
-                    array_push($pending, $newcommit);
+                    $pending[] = $newcommit;
                 }
 
                 if (!$fast_forward && !$fast_merge)

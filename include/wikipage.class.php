@@ -21,7 +21,7 @@ class WikiPage
             $path = explode('/', $path);
         foreach ($path as $part)
             if ($part != '')
-                array_push($this->path, $part);
+                $this->path[] = $part;
         if ($commit === NULL)
             $commit = $repo->getObject($repo->getHead(Config::GIT_BRANCH));
         $this->commit = $commit;
@@ -59,7 +59,7 @@ class WikiPage
         $entries = array();
         foreach ($this->object->nodes as $node)
         {
-            array_push($entries, new WikiPage(array_merge($this->path, array($node->name)), $this->commit));
+            $entries[] = new WikiPage(array_merge($this->path, array($node->name)), $this->commit);
         }
         return $entries;
     }
@@ -99,14 +99,14 @@ class WikiPage
         {
             $dir = FALSE;
             if (!empty($part))
-                array_push($path, urldecode(strtr($part, '_', ' ')));
+                $path[] = urldecode(strtr($part, '_', ' '));
             else
                 $dir = TRUE;
         }
         if (count($path) == 0)
             $path = array('Home');
         else if ($dir)
-            array_push($path, '');
+            $path[] = '';
         return new WikiPage($path, $commit);
     }
 
@@ -136,7 +136,7 @@ class WikiPage
 
             $blob = $commit->find($this->path);
             if ($common !== $blob)
-                array_push($r, $commit);
+                $r[] = $commit;
         }
         return $r;
     }
