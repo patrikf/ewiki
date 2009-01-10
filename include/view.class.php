@@ -25,7 +25,7 @@ class View
         $include_path = get_include_path();
         $template_path = array(
                 'templates/'.Config::TEMPLATE,
-                'templates'
+                'templates/common'
             );
         set_include_path(implode(PATH_SEPARATOR, $template_path));
 
