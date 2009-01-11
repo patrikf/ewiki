@@ -142,7 +142,7 @@ if ($special[0] == 'index')
     $special = NULL;
 }
 
-if ((Config::REQUIRE_LOGIN && !$user) || (Config::AUTHENTICATION && $special[0] == 'login')) // {{{1
+if ((Config::REQUIRE_LOGIN && !$user && $special[0] != 'rss20') || (Config::AUTHENTICATION && $special[0] == 'login')) // {{{1
 {
     $view->setTemplate('login.php');
 
