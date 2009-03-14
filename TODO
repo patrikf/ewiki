@@ -23,3 +23,10 @@ sensible linear history. Using toposort would be a start.
     so. Compare how the rest of the code handles this and create consistent behaviour.
 
 * sort directories first in tree view?
+
+== Stuff to make eWiki more usable
+* Automatic repository/first commit creation
+When the git repository does not exist or the branch defined in the config file
+does not exist, eWiki throws not very useful errors.
+
+* Display a nice error instead of GitTreeInvalidPathError
