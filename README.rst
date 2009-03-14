@@ -6,9 +6,9 @@ Introduction
 ============
 eWiki ("English Wiki") is a small `Wiki <http://en.wikipedia.org/wiki/Wiki>`_
 written in PHP. Instead of using a database to store changes it uses `Git
-<http://en.wikipedia.org/wiki/Wiki>`_. This allows you to run all those fancy
-SCM operations like `bisect`, `blame` and `rebase` on your Wiki, as well as
-editing it offline.
+<http://en.wikipedia.org/wiki/Git_(software)>`_. This allows you to run all
+those fancy SCM operations like `bisect`, `blame` and `rebase` on your Wiki, as
+well as editing it offline.
 
 Requirements
 ============
