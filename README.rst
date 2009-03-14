@@ -4,16 +4,17 @@ eWiki - A simple, git-based Wiki
 
 Introduction
 ============
-eWiki (,,English Wiki'') is a small `Wiki <http://en.wikipedia.org/wiki/Wiki>`_
+eWiki ("English Wiki") is a small `Wiki <http://en.wikipedia.org/wiki/Wiki>`_
 written in PHP. Instead of using a database to store changes it uses `Git
 <http://en.wikipedia.org/wiki/Wiki>`_. This allows you to run all those fancy
-SCM operations like `bisect`, `blame` and `rebase` on your Wiki.
+SCM operations like `bisect`, `blame` and `rebase` on your Wiki, as well as
+editing it offline.
 
 Requirements
 ============
 * PHP > 5.0
-* A server with mod_rewrite or another URL-rewrite mechanism.
-* A database with a `PDO driver <http://php.net/manual/en/pdo.drivers.php>`_  if you want user authentication
+* A server with mod_rewrite or another URL-rewriting mechanism
+* A database with a `PDO driver <http://php.net/manual/en/pdo.drivers.php>`_ if you want user authentication
 
 Installing eWiki
 ================
