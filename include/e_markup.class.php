@@ -54,6 +54,8 @@ abstract class eMarkup
                        { return $this->fmt_plain('[ERROR] '.$s); }
              protected function fmt_image($ref, $width, $height)
                        { return $this->fmt_plain('[IMAGE: '.$ref.']'); }
+             protected function fmt_code($s)
+                       { return $s; }
     /*
      * fmt_plain() gets unchecked user input. If necessary, it should perform
      * whitespace conversion and escaping of special characters.
@@ -264,6 +266,12 @@ abstract class eMarkup
 
     protected function parse_page($in) // {{{1
     {
+        /* recognize shebang */
+        if (substr($in, 0, 2) == '#!')
+        {
+            return $this->fmt_code($this->fmt_plain($in));
+        }
+
         $lines = explode("\n", $in);
         $lines = array_map('trim', $lines);
         $lines = array_filter($lines, array('eMarkup', 'comment_filter'));

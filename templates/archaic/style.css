@@ -151,6 +151,34 @@ table th { font-weight: bold; }
 
 em { font-style: italic; }
 strong { font-weight: bold; }
+
+.listing
+{
+    padding: 5px;
+    font-family: monospace;
+    font-size: .8em;
+}
+
+.listing tr
+{
+    border: 1px solid #FFF;
+}
+
+.listing td
+{
+    line-height: 1.2;
+    background-color: #FCFCFC;
+    padding: 0px .5em;
+}
+
+.listing th
+{
+    width: 3em;
+    text-align: right;
+    vertical-align: top;
+    font-weight: normal;
+    color: #AAA;
+}
 /* history {{{1 */
 table.history
 {

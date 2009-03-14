@@ -61,6 +61,16 @@ class eMarkupXHTML extends eMarkup
         return "<div class=\"par image\"><a href=\"$url\"><img src=\"$url?action=image&amp;width=$width&amp;height=$height\" alt=\"{$page->getName()}\" /></a></div>";
     }
 
+    protected function fmt_code($s)
+    {
+        $lines = explode("\n", $s);
+        $s = '<table class="listing">';
+        foreach ($lines as $i => $line)
+            $s .= sprintf('<tr><th>%d</th><td>%s</td></tr>', $i+1, $line);
+        $s .= '</table>';
+        return $s;
+    }
+
     protected function mklink($ref, $label=NULL)
     {
         list($url, $label2, $valid) = Markup::parseLinkTarget($ref);
