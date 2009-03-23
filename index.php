@@ -56,7 +56,7 @@ function gentoken($len, $chrs='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw
 {
     $str = '';
     for ($i = 0; $i < $len; $i++)
-        $str .= $chrs{rand(0, strlen($chrs)-1)};
+        $str .= $chrs{mt_rand(0, strlen($chrs)-1)};
     return $str;
 }
 
