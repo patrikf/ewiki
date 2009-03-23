@@ -23,7 +23,7 @@ class WikiPage
             if ($part != '')
                 $this->path[] = $part;
         if ($commit === NULL)
-            $commit = $repo->getObject($repo->getHead(Config::GIT_BRANCH));
+            $commit = $repo->getObject($repo->getTip(Config::GIT_BRANCH));
         $this->commit = $commit;
         $name = $commit->find($path);
         $this->object = $name ? $commit->repo->getObject($name) : NULL;

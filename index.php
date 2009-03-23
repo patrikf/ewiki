@@ -108,7 +108,7 @@ $parts = explode('?', $_SERVER['REQUEST_URI'], 2);
 assert(!strncmp($parts[0], Config::PATH, strlen(Config::PATH)));
 $parts[0] = substr($parts[0], strlen(Config::PATH));
 
-$tip = $repo->getHead(Config::GIT_BRANCH);
+$tip = $repo->getTip(Config::GIT_BRANCH);
 $commit = $tip;
 if (isset($_GET['commit']))
     $commit = sha1_bin($_GET['commit']);
@@ -279,7 +279,7 @@ else if ($special[0] == 'merge') // {{{1
 
     foreach (array($A, $B) as $I)
     {
-        $I->tip = $repo->getObject($repo->getHead($I->branch));
+        $I->tip = $repo->getObject($repo->getTip($I->branch));
         $I->commit_id = sha1_hex($I->tip->getName());
     }
 
