@@ -71,31 +71,32 @@ class MIME
         return NULL;
     }
 
-    protected function suffixTree($prefix, $pos, $filename)
-    {
-        list($n, $pos) = $this->nuint32_at($pos, 2);
-
-        for ($i = 0; $i < $n; $i++, $pos += $this->suffix_tree_node_size)
-        {
-            $c = $this->uint32_at($pos);
-            if ($c != 0)
-                $cur = $prefix . chr($c); /* FIXME: make unicode-aware? */
-            if (substr($filename, -strlen($cur)) != $cur)
-                continue;
-            $type_off = $this->uint32_at($pos+4);
-            if (($this->version == '1.0' && $type_off) || $c == 0)
-                return $this->string_at($type_off);
-            $r = $this->suffixTree($cur, $pos+$this->suffix_tree_node_size-8, $filename);
-            if ($r)
-                return $r;
-        }
-        return NULL;
-    }
-
     protected function suffix($filename)
     {
-        $pos = $this->uint32_at(16);
-        return $this->suffixTree('', $pos, $filename);
+        list($n, $pos) = $this->nuint32_at($this->uint32_at(16), 2);
+        $suffix = '';
+
+        for ($i = 0; $i < $n;)
+        {
+            $c = $this->uint32_at($pos);
+            if ($c == 0 || $filename{strlen($filename)-strlen($suffix)-1} == chr($c))
+            {
+                $type_off = $this->uint32_at($pos+4);
+                if (($this->version == '1.0' && $type_off) || $c == 0)
+                    return $this->string_at($type_off);
+                $suffix = chr($c).$suffix; /* FIXME: make unicode-aware? */
+                if (strlen($suffix) >= strlen($filename))
+                    break;
+                list($n, $pos) = $this->nuint32_at($pos+$this->suffix_tree_node_size-8, 2);
+                $i = 0;
+            }
+            else
+            {
+                $i++;
+                $pos += $this->suffix_tree_node_size;
+            }
+        }
+        return NULL;
     }
 
     protected function glob($filename)
