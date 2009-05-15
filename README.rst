@@ -34,6 +34,6 @@ directory structure to a path on your webserver.
 
 Configuring eWiki
 -----------------
-Simple edit the file `include/config.class.php` according to the instructions
+Simply edit the file `include/config.class.php` according to the instructions
 given in the file.
 
