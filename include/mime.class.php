@@ -24,10 +24,22 @@ class MIME
     public function __construct($mime_cache='/usr/share/mime/mime.cache')
     {
         $this->cache = file_get_contents($mime_cache);
-        $this->version[0] = $this->uint16_at(0);
-        $this->version[1] = $this->uint16_at(2);
+        $this->version = sprintf('%d.%d', $this->uint16_at(0), $this->uint16_at(2));
 
-        assert($this->version[0] == 1 && $this->version[1] == 0);
+        if ($this->version == '1.0')
+        {
+            $this->literal_size = 8;
+            $this->glob_size = 8;
+            $this->suffix_tree_node_size = 16;
+        }
+        else if ($this->version == '1.1')
+        {
+            $this->literal_size = 12;
+            $this->glob_size = 12;
+            $this->suffix_tree_node_size = 12;
+        }
+        else
+            throw new Exception('unsupported mime.cache version '.$this->version);
     }
 
     protected function literal($filename)
@@ -42,7 +54,7 @@ class MIME
         while ($span > 0)
         {
             $cur = $a + (int)($span/2);
-            list($lit_off, $type_off) = $this->nuint32_at($pos + 8*$cur, 2);
+            list($lit_off, $type_off) = $this->nuint32_at($pos + $this->literal_size*$cur, 2);
             $c = strcmp($filename, $this->string_at($lit_off));
             if ($c == 0)
                 return $this->string_at($type_off);
@@ -63,16 +75,17 @@ class MIME
     {
         list($n, $pos) = $this->nuint32_at($pos, 2);
 
-        for ($i = 0; $i < $n; $i++, $pos += 16)
+        for ($i = 0; $i < $n; $i++, $pos += $this->suffix_tree_node_size)
         {
-            list($c, $type_off) = $this->nuint32_at($pos, 2);
-            $cur = $prefix . chr($c); /* FIXME: make unicode-aware? */
-            $p = strrpos($filename, $cur);
-            if ($p === FALSE)
+            $c = $this->uint32_at($pos);
+            if ($c != 0)
+                $cur = $prefix . chr($c); /* FIXME: make unicode-aware? */
+            if (substr($filename, -strlen($cur)) != $cur)
                 continue;
-            if ($type_off && $p == strlen($filename)-strlen($cur))
+            $type_off = $this->uint32_at($pos+4);
+            if (($this->version == '1.0' && $type_off) || $c == 0)
                 return $this->string_at($type_off);
-            $r = $this->suffixTree($cur, $pos+8, $filename);
+            $r = $this->suffixTree($cur, $pos+$this->suffix_tree_node_size-8, $filename);
             if ($r)
                 return $r;
         }
@@ -91,7 +104,7 @@ class MIME
         $n = $this->uint32_at($pos);
 
         $pos += 4;
-        for ($i = 0; $i < $n; $i++, $pos += 8)
+        for ($i = 0; $i < $n; $i++, $pos += $this->glob_size)
         {
             list($glob_off, $type_off) = $this->nuint32_at($pos, 2);
             $glob = $this->string_at($glob_off);
