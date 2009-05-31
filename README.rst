@@ -19,6 +19,11 @@ Requirements
 Installing eWiki
 ================
 
+Installing dependencies
+-----------------------
+eWiki uses `glip <http://fimml.at/glip>`_ to access git repositories.
+You should copy or symlink the `lib` folder of glip to `include/glip`.
+
 Setting up a bare git repository
 --------------------------------
 This only sets up a bare repository that will be used by eWiki. You still need

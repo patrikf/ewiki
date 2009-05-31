@@ -12,12 +12,11 @@ require_once('config.class.php');
 setlocale(LC_ALL, Config::LOCALE);
 date_default_timezone_set(Config::TIMEZONE);
 
-require_once('git/git.class.php');
+require_once('glip/glip.php');
 require_once('markup.class.php');
 require_once('wikipage.class.php');
 require_once('view.class.php');
 require_once('mime.class.php');
-require_once('binary.class.php');
 require_once('cache.class.php');
 
 // Functions {{{1
