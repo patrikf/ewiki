@@ -30,13 +30,11 @@ class MIME
         {
             $this->literal_size = 8;
             $this->glob_size = 8;
-            $this->suffix_tree_node_size = 16;
         }
         else if ($this->version == '1.1')
         {
             $this->literal_size = 12;
             $this->glob_size = 12;
-            $this->suffix_tree_node_size = 12;
         }
         else
             throw new Exception('unsupported mime.cache version '.$this->version);
@@ -73,27 +71,65 @@ class MIME
 
     protected function suffix($filename)
     {
-        list($n, $pos) = $this->nuint32_at($this->uint32_at(16), 2);
-        $suffix = '';
-
-        for ($i = 0; $i < $n;)
+        if ($this->version == '1.0')
         {
-            $c = $this->uint32_at($pos);
-            if ($c == 0 || $filename{strlen($filename)-strlen($suffix)-1} == chr($c))
+            /* forward suffix tree */
+            $queue = array(array('', $this->uint32_at(16)));
+
+            while (!empty($queue))
             {
-                $type_off = $this->uint32_at($pos+4);
-                if (($this->version == '1.0' && $type_off) || $c == 0)
-                    return $this->string_at($type_off);
-                $suffix = chr($c).$suffix; /* FIXME: make unicode-aware? */
-                if (strlen($suffix) >= strlen($filename))
-                    break;
-                list($n, $pos) = $this->nuint32_at($pos+$this->suffix_tree_node_size-8, 2);
-                $i = 0;
+                list($suffix, $pos) = array_shift($queue);
+                list($n, $pos) = $this->nuint32_at($pos, 2);
+
+                for ($i = 0; $i < $n; $i++, $pos += 16)
+                {
+                    $c = $this->uint32_at($pos);
+                    $cur = $suffix . chr($c);
+
+                    $idx = strrpos($filename, $cur);
+                    if ($idx === FALSE)
+                        continue;
+                    else if ($idx + strlen($cur) == strlen($filename))
+                    {
+                        $type_off = $this->uint32_at($pos+4);
+                        if ($type_off == 0)
+                            continue;
+                        return $this->string_at($type_off);
+                    }
+                    else
+                        $queue[] = array($cur, $pos+8);
+
+                    $pos += 16;
+                }
             }
-            else
+        }
+        else
+        {
+            /* reverse suffix tree */
+            list($n, $pos) = $this->nuint32_at($this->uint32_at(16), 2);
+            $suffix = '';
+
+            for ($i = 0; $i < $n;)
             {
-                $i++;
-                $pos += $this->suffix_tree_node_size;
+                $c = $this->uint32_at($pos);
+                if ($c == 0)
+                {
+                    $type_off = $this->uint32_at($pos+4);
+                    return $this->string_at($type_off);
+                }
+                else if ($filename{strlen($filename)-strlen($suffix)-1} == chr($c))
+                {
+                    $suffix = chr($c).$suffix; /* FIXME: make unicode-aware? */
+                    if (strlen($suffix) >= strlen($filename))
+                        break;
+                    list($n, $pos) = $this->nuint32_at($pos+4, 2);
+                    $i = 0;
+                }
+                else
+                {
+                    $i++;
+                    $pos += 12;
+                }
             }
         }
         return NULL;
