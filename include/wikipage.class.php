@@ -85,7 +85,7 @@ class WikiPage
             return NULL;
         if (!$this->mime_type)
         {
-            $mime = new MIME;
+            $mime = new MIME(Config::MIME_CACHE_PATH);
             $this->mime_type = $mime->bufferGetType($this->object->data, $this->getName());
         }
         return $this->mime_type;

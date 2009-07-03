@@ -21,24 +21,13 @@ class MIME
     protected function uint32_at($pos) { return Binary::uint32($this->cache, $pos); }
     protected function nuint32_at($pos, $n) { return Binary::nuint32($n, $this->cache, $pos); }
 
-    public function __construct($mime_cache=null)
+    public function __construct($mime_cache='/usr/share/mime/mime.cache')
     {
-        if ($mime_cache === null)
-        {
-            if (defined('Config::MIME_CACHE_PATH'))
-            {
-                $mime_cache = Config::MIME_CACHE_PATH;
-            }
-            else
-            {
-                $mime_cache = '/usr/share/mime/mime.cache';
-            }
-        }
         if (!is_readable($mime_cache))
         {
-            throw new Exception('unable to read mime.cache file');
+            throw new Exception('unable to read '.$mime_cache);
         }
-        
+
         $this->cache = file_get_contents($mime_cache);
         $this->version = sprintf('%d.%d', $this->uint16_at(0), $this->uint16_at(2));
 

@@ -55,9 +55,9 @@ final class Config
 
     // How to sort pages in tree view (comparison callback)
     const TREE_VIEW_SORT = 'strnatcmp';
-    
-    // alternate mime.cache path (optional)
-    //const MIME_CACHE_PATH = '/usr/local/share/mime/mime.cache';
+
+    // Path to mime.cache
+    const MIME_CACHE_PATH = '/usr/share/mime/mime.cache';
 }
 
 ?>
