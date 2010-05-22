@@ -200,7 +200,7 @@ else if ($special[0] == 'recent' || $special[0] == "rss20") // {{{1
         $commits[$i]->commit_id = sha1_hex($cur->getName());
         $commits[$i]->author = $cur->author->name;
         $commits[$i]->email = $cur->author->email;
-        $commits[$i]->time = $cur->committer->time;
+        $commits[$i]->time = $cur->author->time;
         $commits[$i]->summary = $cur->summary;
         $commits[$i]->detail = $cur->detail;
 
@@ -448,7 +448,7 @@ else if ($special === NULL) // page-related {{{1
             $entry = new stdClass;
             $entry->summary = $commit->summary;
             $entry->author = $commit->author->name;
-            $entry->time = $commit->committer->time;
+            $entry->time = $commit->author->time;
             $entry->commit = sha1_hex($commit->getName());
             array_unshift($history, $entry);
         }
