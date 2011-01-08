@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <title><?= Config::WIKI_NAME ?>: <?= Markup::escape($title) ?></title>
-<link rel="stylesheet" href="<?= Config::PATH . '/templates/' . Config::TEMPLATE . '/style.css' ?>" />
+<link rel="stylesheet" type="text/css" href="<?= Config::PATH . '/templates/' . Config::TEMPLATE . '/style.css' ?>" />
 <script type="text/javascript" src="<?= Config::PATH ?>/mootools-1.2-core-nc.js"></script>
 <script type="text/javascript" src="<?= Config::PATH ?>/templates/<?= Config::TEMPLATE ?>/site.js"></script>
 <meta name="date" content="<?= date('r', (isset($page) ? $page->getLastModified() : time())) ?>" />
