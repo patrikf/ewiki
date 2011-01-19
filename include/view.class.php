@@ -7,7 +7,7 @@ class View
 
     function __set($name, $value) { $this->dict[$name] = $value; }
     function &__get($name) { return $this->dict[$name]; }
-    function __isset($name) { isset($this->dict[$name]); }
+    function __isset($name) { return isset($this->dict[$name]); }
     function __unset($name) { unset($this->dict[$name]); }
 
     public function __construct($template=NULL)
